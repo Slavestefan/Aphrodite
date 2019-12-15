@@ -107,7 +107,6 @@ namespace PicAutoPost.Services
             {
                 // We don't actually care about any errors in here.
             }
-            
         }
 
         private Task Client_Log(Discord.LogMessage arg)
@@ -160,6 +159,7 @@ namespace PicAutoPost.Services
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             _keepAlive.Dispose();
+            _changeGameTimer.Dispose();
             await Client.LogoutAsync();
         }
 
@@ -241,29 +241,6 @@ namespace PicAutoPost.Services
         internal List<(ulong, bool, TimeSpan)> GetPostingServiceStatus()
         {
             return _postingServices.Select(x => (x.Key, x.Value.Service.IsRunning, x.Value.Service.GetTimeUntilNextPost())).ToList();
-        }
-
-        private void LogMessage(SocketMessage msg)
-        {
-            if (msg.Channel.Id == 655373538852732928)
-            {
-                return;
-            }
-            using var scope = _serviceProvider.CreateScope();
-            var dbcontext = scope.ServiceProvider.GetRequiredService<PicAutoPostContext>();
-            var log = new Log
-            {
-                Author = msg.Author.Username,
-                AuthorId = msg.Author.Id,
-                ChannelId = msg.Channel.Id,
-                ChannelName = msg.Channel.Name,
-                IdLog = Guid.NewGuid(),
-                Message = msg.Content,
-                Timestamp = msg.Timestamp.DateTime
-            };
-
-            dbcontext.Logs.Add(log);
-            dbcontext.SaveChanges();
         }
     }
 }
