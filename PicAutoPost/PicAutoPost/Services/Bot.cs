@@ -115,6 +115,12 @@ namespace Slavestefan.Aphrodite.Web.Services
             await base.StartAsync(cancellationToken);
         }
 
+        private async Task MessWithSatin(SocketMessage message)
+        {
+            var index = _rng.Next(0, Constants.MessingPhrases.Satin.Length);
+            await message.Channel.SendMessageAsync($"```{MessingPhrases.Satin[index]}```");
+        }
+
         private async Task Client_MessageReceived(SocketMessage message)
         {
             if (message.Author.Id == 474751258834501633 && _antiSatinMode && message.Content.ToLower().Contains("aphrodite"))
