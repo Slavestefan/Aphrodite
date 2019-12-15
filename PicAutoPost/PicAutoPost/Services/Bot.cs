@@ -125,7 +125,7 @@ namespace Slavestefan.Aphrodite.Web.Services
         {
             if (message.Author.Id == 474751258834501633 && _antiSatinMode && message.Content.ToLower().Contains("aphrodite"))
             {
-                await message.Channel.SendMessageAsync("```Shoo Satin!```");
+                await MessWithSatin(message);
                 return;
             }
 
