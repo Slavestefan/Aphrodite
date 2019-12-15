@@ -7,7 +7,7 @@ using Slavestefan.Aphrodite.Web.Helpers;
 
 namespace Slavestefan.Aphrodite.Web.Services
 {
-    public class PostingService
+    public class PostingService : IDisposable
     {
         private readonly Bot _bot;
         private readonly PicAutoPostContext _dbContext;
@@ -58,7 +58,7 @@ namespace Slavestefan.Aphrodite.Web.Services
         {
             if (_token.IsCancellationRequested)
             {
-                _timer.Dispose();
+                _timer?.Dispose();
                 return;
             }
 
@@ -90,6 +90,11 @@ namespace Slavestefan.Aphrodite.Web.Services
         public TimeSpan GetTimeUntilNextPost()
         {
             return _lastFire + new TimeSpan(0, 0, 0, 0, _interval) - DateTime.Now;
+        }
+
+        public void Dispose()
+        {
+            _timer?.Dispose();
         }
     }
 }

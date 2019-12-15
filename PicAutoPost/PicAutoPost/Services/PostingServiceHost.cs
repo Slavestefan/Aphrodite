@@ -63,7 +63,6 @@ namespace Slavestefan.Aphrodite.Web.Services
 
             var (service, scope, tokenSource) = _postingServices[channelId];
             tokenSource.Cancel();
-            service.Stop();
             scope.Dispose();
             _postingServices.Remove(channelId);
         }
