@@ -3,7 +3,7 @@ using Discord.Commands;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace PicAutoPost.Modules
+namespace Slavestefan.Aphrodite.Web.Modules
 {
     public class DbModuleBase<TDbContext> : ModuleBase<SocketCommandContext> where TDbContext : DbContext, IDisposable
     {

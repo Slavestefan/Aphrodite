@@ -3,11 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord.Commands;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using PicAutoPost.Services;
-using Slavestefan.PicAutoPost.Model;
+using Slavestefan.Aphrodite.Model;
+using Slavestefan.Aphrodite.Web.Services;
 
-namespace PicAutoPost.Modules
+namespace Slavestefan.Aphrodite.Web.Modules
 {
     public class StartStopModule : DbModuleBase<PicAutoPostContext>
     {

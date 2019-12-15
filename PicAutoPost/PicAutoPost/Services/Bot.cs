@@ -11,10 +11,10 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using PicAutoPost.Constants;
-using Slavestefan.PicAutoPost.Model;
+using Slavestefan.Aphrodite.Model;
+using Slavestefan.Aphrodite.Web.Constants;
 
-namespace PicAutoPost.Services
+namespace Slavestefan.Aphrodite.Web.Services
 {
     public class Bot : BackgroundService
     {

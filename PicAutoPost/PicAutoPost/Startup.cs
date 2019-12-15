@@ -1,21 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Discord.Commands;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using PicAutoPost.Logger;
-using PicAutoPost.Services;
-using Slavestefan.PicAutoPost.Model;
+using Slavestefan.Aphrodite.Model;
+using Slavestefan.Aphrodite.Web.Logger;
+using Slavestefan.Aphrodite.Web.Services;
 
-namespace PicAutoPost
+namespace Slavestefan.Aphrodite.Web
 {
     public class Startup
     {

@@ -1,7 +1,7 @@
 ﻿using Discord;
-using Slavestefan.PicAutoPost.Model;
+using Slavestefan.Aphrodite.Model;
 
-namespace PicAutoPost.Helpers
+namespace Slavestefan.Aphrodite.Web.Helpers
 {
     public static class Converter
     {

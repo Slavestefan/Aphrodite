@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Slavestefan.PicAutoPost.Model.Migrations
+namespace Slavestefan.Aphrodite.Model.Migrations
 {
     public partial class InitalCreate : Migration
     {

@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Slavestefan.PicAutoPost.Model;
+using Slavestefan.Aphrodite.Model;
 
-namespace Slavestefan.PicAutoPost.Model.Migrations
+namespace Slavestefan.Aphrodite.Model.Migrations
 {
     [DbContext(typeof(PicAutoPostContext))]
     partial class PicAutoPostContextModelSnapshot : ModelSnapshot
@@ -19,7 +19,7 @@ namespace Slavestefan.PicAutoPost.Model.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Slavestefan.PicAutoPost.Model.Log", b =>
+            modelBuilder.Entity("Slavestefan.Aphrodite.Model.Log", b =>
                 {
                     b.Property<Guid>("IdLog")
                         .ValueGeneratedOnAdd()
@@ -48,7 +48,7 @@ namespace Slavestefan.PicAutoPost.Model.Migrations
                     b.ToTable("Logs");
                 });
 
-            modelBuilder.Entity("Slavestefan.PicAutoPost.Model.Picture", b =>
+            modelBuilder.Entity("Slavestefan.Aphrodite.Model.Picture", b =>
                 {
                     b.Property<Guid>("IdPicture")
                         .ValueGeneratedOnAdd()
@@ -78,7 +78,7 @@ namespace Slavestefan.PicAutoPost.Model.Migrations
                     b.ToTable("Pictures");
                 });
 
-            modelBuilder.Entity("Slavestefan.PicAutoPost.Model.PicturePool", b =>
+            modelBuilder.Entity("Slavestefan.Aphrodite.Model.PicturePool", b =>
                 {
                     b.Property<Guid>("IdPicturePool")
                         .ValueGeneratedOnAdd()
@@ -99,7 +99,7 @@ namespace Slavestefan.PicAutoPost.Model.Migrations
                     b.ToTable("PicturePool");
                 });
 
-            modelBuilder.Entity("Slavestefan.PicAutoPost.Model.PostConfiguration", b =>
+            modelBuilder.Entity("Slavestefan.Aphrodite.Model.PostConfiguration", b =>
                 {
                     b.Property<Guid>("IdConfiguration")
                         .ValueGeneratedOnAdd()
@@ -134,7 +134,7 @@ namespace Slavestefan.PicAutoPost.Model.Migrations
                     b.ToTable("Configurations");
                 });
 
-            modelBuilder.Entity("Slavestefan.PicAutoPost.Model.User", b =>
+            modelBuilder.Entity("Slavestefan.Aphrodite.Model.User", b =>
                 {
                     b.Property<Guid>("IdUser")
                         .ValueGeneratedOnAdd()
@@ -151,24 +151,24 @@ namespace Slavestefan.PicAutoPost.Model.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Slavestefan.PicAutoPost.Model.Picture", b =>
+            modelBuilder.Entity("Slavestefan.Aphrodite.Model.Picture", b =>
                 {
-                    b.HasOne("Slavestefan.PicAutoPost.Model.PicturePool", null)
+                    b.HasOne("Slavestefan.Aphrodite.Model.PicturePool", null)
                         .WithMany("Pictures")
                         .HasForeignKey("PicturePoolIdPicturePool");
 
-                    b.HasOne("Slavestefan.PicAutoPost.Model.User", "User")
+                    b.HasOne("Slavestefan.Aphrodite.Model.User", "User")
                         .WithMany()
                         .HasForeignKey("UserIdUser");
                 });
 
-            modelBuilder.Entity("Slavestefan.PicAutoPost.Model.PicturePool", b =>
+            modelBuilder.Entity("Slavestefan.Aphrodite.Model.PicturePool", b =>
                 {
-                    b.HasOne("Slavestefan.PicAutoPost.Model.User", "Owner")
+                    b.HasOne("Slavestefan.Aphrodite.Model.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerIdUser");
 
-                    b.HasOne("Slavestefan.PicAutoPost.Model.PostConfiguration", null)
+                    b.HasOne("Slavestefan.Aphrodite.Model.PostConfiguration", null)
                         .WithMany("Pool")
                         .HasForeignKey("PostConfigurationIdConfiguration");
                 });

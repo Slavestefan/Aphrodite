@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
-using PicAutoPost.Services;
+using Microsoft.Extensions.Logging;
+using Slavestefan.Aphrodite.Web.Services;
 
-namespace PicAutoPost.Logger
+namespace Slavestefan.Aphrodite.Web.Logger
 {
     public class DiscordLogger : ILogger
     {

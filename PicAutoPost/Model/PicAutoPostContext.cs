@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace Slavestefan.PicAutoPost.Model
+namespace Slavestefan.Aphrodite.Model
 {
     public class PicAutoPostContext : DbContext
     {

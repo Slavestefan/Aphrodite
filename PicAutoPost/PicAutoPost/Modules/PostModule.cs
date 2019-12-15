@@ -3,11 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Discord.Commands;
 using Microsoft.EntityFrameworkCore;
-using PicAutoPost.Helpers;
-using PicAutoPost.Services;
-using Slavestefan.PicAutoPost.Model;
+using Slavestefan.Aphrodite.Model;
+using Slavestefan.Aphrodite.Web.Helpers;
+using Slavestefan.Aphrodite.Web.Services;
 
-namespace PicAutoPost.Modules
+namespace Slavestefan.Aphrodite.Web.Modules
 {
     public class PostModule : DbModuleBase<PicAutoPostContext>, IDisposable
     {

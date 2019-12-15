@@ -1,6 +1,4 @@
-using System;
-
-namespace PicAutoPost.Models
+namespace Slavestefan.Aphrodite.Web.Models
 {
     public class ErrorViewModel
     {

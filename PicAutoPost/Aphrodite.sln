@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PicAutoPost", "PicAutoPost\PicAutoPost.csproj", "{26EE742C-08DB-472B-B598-72FE2457CE81}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Web", "PicAutoPost\Web.csproj", "{26EE742C-08DB-472B-B598-72FE2457CE81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Model", "Model\Model.csproj", "{97E6B336-5859-4C8D-AEB5-D84E90AB1A29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Model", "Model\Model.csproj", "{97E6B336-5859-4C8D-AEB5-D84E90AB1A29}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

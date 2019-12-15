@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using PicAutoPost.Models;
+using Slavestefan.Aphrodite.Web.Models;
 
-namespace PicAutoPost.Controllers
+namespace Slavestefan.Aphrodite.Web.Controllers
 {
     public class HomeController : Controller
     {

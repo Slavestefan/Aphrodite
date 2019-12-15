@@ -1,4 +1,4 @@
-﻿namespace PicAutoPost.Constants
+﻿namespace Slavestefan.Aphrodite.Web.Constants
 {
     public class Users
     {
