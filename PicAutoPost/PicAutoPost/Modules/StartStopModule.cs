@@ -78,6 +78,16 @@ namespace Slavestefan.Aphrodite.Web.Modules
         [Command("Stop")]
         public async Task Stop()
         {
+            var config = await TypedDbContext.Configurations.FirstOrDefaultAsync(x => x.ChannelId == Context.Channel.Id && x.UserId == Context.Message.Author.Id);
+            if (config == null)
+            {
+                await ReplyAsync("```I'm not running here for you.```");
+                return;
+            }
+
+            config.IsRunning = false;
+            TypedDbContext.SaveChanges();
+
             _postingHost.StopPostingService(Context.Channel.Id);
             await ReplyAsync("```Autoposting stopped```");
         }

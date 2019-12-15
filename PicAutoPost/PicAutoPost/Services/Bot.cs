@@ -98,7 +98,7 @@ namespace Slavestefan.Aphrodite.Web.Services
             }
             catch
             {
-                // We don't actually care about any errors in here.
+                // We don't actually care about any errors in here. Don't question it, the line above saves me 40€ a month.
             }
         }
 
