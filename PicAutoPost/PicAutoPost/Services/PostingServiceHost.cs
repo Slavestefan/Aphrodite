@@ -21,7 +21,13 @@ namespace Slavestefan.Aphrodite.Web.Services
 
         internal void StartupPosting()
         {
-
+            using var scope = _services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<PicAutoPostContext>();
+            var configs = dbContext.Configurations.Where(x => x.IsRunning);
+            foreach (var config in configs)
+            {
+                StartPostingService(config);
+            }
         }
 
         internal void StartPostingService(PostConfiguration config)
