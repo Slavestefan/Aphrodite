@@ -160,6 +160,16 @@ namespace PicAutoPost.Services
         {
             _keepAlive.Dispose();
             _changeGameTimer.Dispose();
+
+            foreach (var kvp in _postingServices)
+            {
+                (PostingService service, IServiceScope scope, CancellationTokenSource token) = kvp.Value;
+                token.Cancel();
+                service.Stop();
+                scope.Dispose();
+            }
+
+            _postingServices.Clear();
             await Client.LogoutAsync();
         }
 
