@@ -10,10 +10,12 @@ namespace Slavestefan.Aphrodite.Web.Modules
     public class DebugModule : DbModuleBase<PicAutoPostContext>
     {
         private readonly Bot _bot;
+        private readonly PostingServiceHost _postingServiceHost;
 
-        public DebugModule(IServiceProvider services, Bot bot) : base(services)
+        public DebugModule(IServiceProvider services, Bot bot, PostingServiceHost postingServiceHost) : base(services)
         {
             _bot = bot;
+            _postingServiceHost = postingServiceHost;
         }
 
         [Command("Status")]
@@ -24,7 +26,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
                 return;
             }
 
-            var postingServiceStatus = _bot.GetPostingServiceStatus();
+            var postingServiceStatus = _postingServiceHost.GetPostingServiceStatus();
 
             await ReplyAsync($"```Currently running {postingServiceStatus.Count} services: \n{string.Join(Environment.NewLine, postingServiceStatus.Select(x => $"ChannelId: {x.Item1} Running: {x.Item2} Timer: about {x.Item3.TotalMinutes} Minutes"))}```");
             await ReplyAsync($"```{TypedDbContext.Pictures.Count()} pictures in store.```");

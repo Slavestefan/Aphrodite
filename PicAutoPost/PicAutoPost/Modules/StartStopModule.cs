@@ -10,11 +10,11 @@ namespace Slavestefan.Aphrodite.Web.Modules
 {
     public class StartStopModule : DbModuleBase<PicAutoPostContext>
     {
-        private readonly Bot _bot;
+        private readonly PostingServiceHost _postingHost;
 
-        public StartStopModule(IServiceProvider services, Bot bot) : base(services)
+        public StartStopModule(IServiceProvider services, PostingServiceHost postingHost) : base(services)
         {
-            _bot = bot;
+            _postingHost = postingHost;
         }
 
         [Priority(10)]
@@ -38,7 +38,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
             config.IsRunning = true;
             TypedDbContext.SaveChanges();
             await ReplyAsync("```Autoposting started```");
-            _bot.StartPostingService(Context.Channel.Id);
+            _postingHost.StartPostingService(config);
         }
 
         [Priority(20)]
@@ -78,7 +78,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
         [Command("Stop")]
         public async Task Stop()
         {
-            _bot.StopPostingService(Context.Channel.Id);
+            _postingHost.StopPostingService(Context.Channel.Id);
             await ReplyAsync("```Autoposting stopped```");
         }
     }

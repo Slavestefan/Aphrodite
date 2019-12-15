@@ -84,15 +84,8 @@ namespace Slavestefan.Aphrodite.Web.Services
 
         private Task StartPosting()
         {
-            using var scope = _serviceProvider.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<PicAutoPostContext>();
-            var configurations = dbContext.Configurations.Where(x => x.IsRunning).ToList();
-
-            foreach (var config in configurations)
-            {
-                StartPostingService(config.ChannelId);
-            }
-
+            var postingService = _serviceProvider.GetService<PostingServiceHost>();
+            postingService.StartupPosting();
             return Task.CompletedTask;
         }
 
@@ -161,15 +154,7 @@ namespace Slavestefan.Aphrodite.Web.Services
             _keepAlive.Dispose();
             _changeGameTimer.Dispose();
 
-            foreach (var kvp in _postingServices)
-            {
-                (PostingService service, IServiceScope scope, CancellationTokenSource token) = kvp.Value;
-                token.Cancel();
-                service.Stop();
-                scope.Dispose();
-            }
 
-            _postingServices.Clear();
             await Client.LogoutAsync();
         }
 
@@ -208,49 +193,6 @@ namespace Slavestefan.Aphrodite.Web.Services
             {
                 await channel.SendMessageAsync($"```{message}```", embed: embed);
             }
-        }
-
-        internal void StartPostingService(ulong channelId)
-        {
-            (PostingService Service, IServiceScope Scope, CancellationTokenSource TokenSource) tuple;
-            if (_postingServices.ContainsKey(channelId))
-            {
-                tuple = _postingServices[channelId];
-                if (tuple.Service.IsRunning)
-                {
-                    return;
-                }
-
-                tuple.TokenSource = new CancellationTokenSource();
-            }
-            else
-            {
-                tuple.Scope = _serviceProvider.CreateScope();
-                tuple.Service = tuple.Scope.ServiceProvider.GetRequiredService<PostingService>();
-                tuple.TokenSource = new CancellationTokenSource();
-                _postingServices.Add(channelId, tuple);
-            }
-
-            tuple.Service.Start(channelId, tuple.TokenSource.Token);
-        }
-
-        internal void StopPostingService(ulong channelId)
-        {
-            if (!_postingServices.ContainsKey(channelId))
-            {
-                return;
-            }
-
-            var (service, scope, tokenSource) = _postingServices[channelId];
-            tokenSource.Cancel();
-            service.Stop();
-            scope.Dispose();
-            _postingServices.Remove(channelId);
-        }
-
-        internal List<(ulong, bool, TimeSpan)> GetPostingServiceStatus()
-        {
-            return _postingServices.Select(x => (x.Key, x.Value.Service.IsRunning, x.Value.Service.GetTimeUntilNextPost())).ToList();
         }
     }
 }

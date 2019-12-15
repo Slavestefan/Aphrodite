@@ -29,6 +29,7 @@ namespace Slavestefan.Aphrodite.Web
             services.AddSingleton<CommandService>();
             services.AddSingleton<Bot>(sp => new Bot(sp, Configuration.GetSection("DiscordBotToken").GetValue<string>("Aphrodite")));
             services.AddSingleton<IHostedService>(sp => sp.GetService<Bot>());
+            services.AddSingleton<PostingServiceHost>();
             services.AddScoped<PostingService>();
             services.AddControllersWithViews();
 
