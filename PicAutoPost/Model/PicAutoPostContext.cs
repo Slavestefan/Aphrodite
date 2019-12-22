@@ -17,6 +17,10 @@ namespace Slavestefan.Aphrodite.Model
         public DbSet<PostConfiguration> Configurations { get; set; }
         public DbSet<Picture> Pictures { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<Log> Logs { get; set; }
+        public DbSet<BotConfiguration> BotConfigurations { get; set; }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<BotConfiguration>().HasIndex(b => new {b.ChannelId, b.Key}).IsUnique();
+        }
     }
 } 

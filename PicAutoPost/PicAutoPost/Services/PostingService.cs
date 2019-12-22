@@ -63,33 +63,40 @@ namespace Slavestefan.Aphrodite.Web.Services
 
         private void Post(object state)
         {
-            if (_token.IsCancellationRequested)
-            {
-                _timer?.Dispose();
-                return;
-            }
 
-            var config = (PostConfiguration) state;
-            var picCount = _rng.Rng.Next(config.MinPostPerInterval, config.MaxPostPerInterval + 1);
-            var pics = _dbContext.Pictures.Include(x => x.User).Where(x => x.User.DiscordId == config.UserId);
-            var skips = new int?[picCount];
-            for (var i = 0; i < picCount; ++i)
-            {
-                int skip = _rng.Rng.Next(0, pics.Count());
-                while (skips.Contains(skip) && pics.Count() > picCount)
+                if (_token.IsCancellationRequested)
                 {
-                    skip = _rng.Rng.Next(0, pics.Count());
+                    _timer?.Dispose();
+                    return;
                 }
-                skips[i] = skip;
-                var task = _bot.SendMessage(string.Empty, config.ChannelId, Converter.ToEmbed(pics.Skip(skip).Take(1).First()));
-            }
 
-            config.LastPost = DateTime.Now;
-            _lastFire = DateTime.Now;
-            _interval = GetNextPostingInterval(config);
-            _dbContext.SaveChanges();
-            _logger.LogInformation($"Posted {picCount} Pictures in channel {config.ChannelId} for user {config.UserId}. Next post in {_interval} ms.");
-            _timer.Change(_interval, Timeout.Infinite);
+                var config = (PostConfiguration)state;
+            try 
+            {
+                var picCount = _rng.Rng.Next(config.MinPostPerInterval, config.MaxPostPerInterval + 1);
+                var pics = _dbContext.Pictures.Include(x => x.User).Where(x => x.User.DiscordId == config.UserId);
+                var skips = new int?[picCount];
+                for (var i = 0; i < picCount; ++i)
+                {
+                    int skip = _rng.Rng.Next(0, pics.Count());
+                    while (skips.Contains(skip) && pics.Count() > picCount)
+                    {
+                        skip = _rng.Rng.Next(0, pics.Count());
+                    }
+                    skips[i] = skip;
+                    var task = _bot.SendMessage(string.Empty, config.ChannelId, Converter.ToEmbed(pics.Skip(skip).Take(1).First()));
+                }
+
+                config.LastPost = DateTime.Now;
+                _lastFire = DateTime.Now;
+                _interval = GetNextPostingInterval(config);
+                _dbContext.SaveChanges();
+                _logger.LogInformation($"Posted {picCount} Pictures in channel {config.ChannelId} for user {config.UserId}. Next post in {_interval} ms.");
+                _timer.Change(_interval, Timeout.Infinite);
+            } catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Exception while posting in channel {config.ChannelId} for user {config.UserId}");
+            }
         }
 
         private int GetNextPostingInterval(PostConfiguration config)

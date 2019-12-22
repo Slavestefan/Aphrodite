@@ -37,7 +37,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
         public async Task SetLogLevel(int level)
         {
             DiscordLogger.LogLevel = (LogLevel)level;
-            await ReplyAsync("Log level set");
+            await ReplyAsync("```Log level set```");
         }
     }
 }

@@ -123,8 +123,6 @@ namespace Slavestefan.Aphrodite.Web.Modules
                 await Context.Channel.SendMessageAsync($"```Use \"!ap start {channelId}\" to start me first```");
                 return;
             }
-
-
         }
     }
 }
