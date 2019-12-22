@@ -55,7 +55,7 @@ namespace Slavestefan.Aphrodite.Web.Services
             var config = _dbContext.Configurations.First(x => x.ChannelId == _channelId);
             config.IsRunning = false;
             _dbContext.SaveChanges();
-            _logger.LogInformation($"Autoposting started in {config.ChannelId} for user {config.UserId}");
+            _logger.LogInformation($"Autoposting stopped in {config.ChannelId} for user {config.UserId}");
             IsRunning = false;
             _timer?.Dispose();
             _timer = null;

@@ -81,7 +81,7 @@ namespace Slavestefan.Aphrodite.Web.Services
             {
                 (PostingService service, IServiceScope scope, CancellationTokenSource token) = kvp.Value;
                 token.Cancel();
-                service.Stop();
+                service.Dispose();
                 scope.Dispose();
             }
 
