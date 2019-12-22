@@ -3,26 +3,28 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Discord.Commands;
+using Microsoft.Extensions.Logging;
 using Slavestefan.Aphrodite.Model;
 
 namespace Slavestefan.Aphrodite.Web.Modules
 {
     public class AddModule : DbModuleBase<PicAutoPostContext>, IDisposable
     {
+        private readonly ILogger<DbModuleBase<PicAutoPostContext>> _logger;
         private HttpClient _client;
 
-        public AddModule(IServiceProvider services) : base(services)
+        public AddModule(IServiceProvider services, ILogger<AddModule> logger) : base(services)
         {
+            _logger = logger;
         }
 
         private HttpClient HttpClient
             => _client ??= new HttpClient();
 
         [Command("Add")]
-        //[Alias("add")]
-        //[Summary("Foos a bar")]
-        public async Task AddPic([Remainder] string foo = "")
+        public async Task AddPic()
         {
+            _logger.LogDebug("Add Pic called by user " + Context.Message.Author.Id);
             if (!(Context.Message.Embeds.Any() || Context.Message.Attachments.Any()))
             {
                 await ReplyAsync("```No picture found```");
@@ -56,6 +58,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
 
             TypedDbContext.SaveChanges();
             await ReplyAsync($"```{count} picture{(count > 1 ? "s" : "")} added```");
+            _logger.LogInformation($"```{count} picture{(count > 1 ? "s" : "")} added by user {Context.Message.Author.Id}```");
         }
 
         private async Task<Picture> ExtractImage(string url, User user)

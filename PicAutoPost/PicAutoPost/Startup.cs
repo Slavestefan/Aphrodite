@@ -48,13 +48,15 @@ namespace Slavestefan.Aphrodite.Web
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
+                
             }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
             loggerFactory.AddProvider(new DiscordLoggerProvider(new DiscordLoggerConfiguration
             {
-                ChannelId = 655401937809834005,
+                ChannelId = Configuration.GetSection("Logging").GetValue<ulong>("DiscordLogChannel"),
                 LogLevel = LogLevel.Warning
             }, app.ApplicationServices));
             app.UseAuthorization();

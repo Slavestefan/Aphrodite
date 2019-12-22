@@ -12,6 +12,8 @@ namespace Slavestefan.Aphrodite.Web.Helpers
                 ImageUrl = pic.Location.ToString(),
             };
 
+            
+
             return builder.Build();
         }
     }

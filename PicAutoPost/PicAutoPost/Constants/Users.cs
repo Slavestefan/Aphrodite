@@ -1,4 +1,6 @@
-﻿namespace Slavestefan.Aphrodite.Web.Constants
+﻿using System.Collections.Generic;
+
+namespace Slavestefan.Aphrodite.Web.Constants
 {
     public class Users
     {

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Slavestefan.Aphrodite.Model;
 
 namespace Slavestefan.Aphrodite.Web.Services
@@ -24,6 +25,8 @@ namespace Slavestefan.Aphrodite.Web.Services
             using var scope = _services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<PicAutoPostContext>();
             var configs = dbContext.Configurations.Where(x => x.IsRunning);
+            var logger = scope.ServiceProvider.GetService<ILogger<PostingServiceHost>>();
+            logger.LogInformation($"Resuming {configs.Count()} autoposters after restart");
             foreach (var config in configs)
             {
                 StartPostingService(config);

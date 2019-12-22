@@ -133,12 +133,6 @@ namespace Slavestefan.Aphrodite.Web.Services
             {
                 return;
             }
-            
-            if (!(msg.Author.Id == Users.EmpressKatie || msg.Author.Id == Users.Slavestefan))
-            {
-                await msg.Channel.SendMessageAsync("You don't have the permission to use me ;)");
-                return;
-            }
 
             if (msg.Content.ToLower() == "!ap antisatinmode")
             {
@@ -185,8 +179,7 @@ namespace Slavestefan.Aphrodite.Web.Services
 
         internal async Task SendMessage(string message, ulong channelId, Embed embed = null)
         {
-            var channel = _client.GetChannel(channelId) as ISocketMessageChannel;
-            if (channel == null)
+            if (!(_client.GetChannel(channelId) is ISocketMessageChannel channel))
             {
                 throw new ArgumentException($"Channel {channelId} not found");
             }
@@ -197,8 +190,29 @@ namespace Slavestefan.Aphrodite.Web.Services
             }
             else
             {
-                await channel.SendMessageAsync($"```{message}```", embed: embed);
+                if (!message.StartsWith("```"))
+                {
+                    message = "```" + message;
+                }
+
+                if (!message.EndsWith("```"))
+                {
+                    message = message + "```";
+                }
+
+                await channel.SendMessageAsync(message, embed: embed);
             }
+        }
+
+        public string GetChannelNameFromSnowflake(ulong channelId)
+        {
+            var channel = _client.GetChannel(channelId) as SocketGuildChannel;
+            if (channel == null)
+            {
+                throw new ArgumentException("Channel not found or not a guild channel");
+            }
+
+            return channel.Name;
         }
     }
 }

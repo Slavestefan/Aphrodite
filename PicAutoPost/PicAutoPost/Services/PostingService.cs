@@ -1,9 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Slavestefan.Aphrodite.Model;
 using Slavestefan.Aphrodite.Web.Helpers;
+using System;
+using System.Linq;
+using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace Slavestefan.Aphrodite.Web.Services
 {
@@ -12,19 +13,22 @@ namespace Slavestefan.Aphrodite.Web.Services
         private readonly Bot _bot;
         private readonly PicAutoPostContext _dbContext;
         private readonly RandomService _rng;
+        private readonly ILogger<PostingService> _logger;
         private DateTime _lastFire;
         private int _interval;
         private ulong _channelId;
         private CancellationToken _token;
         private Timer _timer;
+        private bool InSithMode;
 
         public bool IsRunning { get; set; } = false;
 
-        public PostingService(Bot bot, PicAutoPostContext dbContext, RandomService rng)
+        public PostingService(Bot bot, PicAutoPostContext dbContext, RandomService rng, ILogger<PostingService> logger)
         {
             _bot = bot;
             _dbContext = dbContext;
             _rng = rng;
+            _logger = logger;
         }
 
         public void Start(ulong channelId, CancellationToken cancellationToken)
@@ -39,16 +43,19 @@ namespace Slavestefan.Aphrodite.Web.Services
                 TimeSpan timeSinceLastPost = DateTime.Now - config.LastPost.Value;
                 skip = timeSinceLastPost.TotalMilliseconds;
             }
+
+            _logger.LogInformation($"Autoposting started in {channelId} for user {config.UserId}");
             _lastFire = DateTime.Now;
             _interval = (int) Math.Max(GetNextPostingInterval(config) - skip, 0);
             _timer = new Timer(Post, config, _interval, Timeout.Infinite);
         }
-
+        
         public void Stop()
         {
             var config = _dbContext.Configurations.First(x => x.ChannelId == _channelId);
             config.IsRunning = false;
             _dbContext.SaveChanges();
+            _logger.LogInformation($"Autoposting started in {config.ChannelId} for user {config.UserId}");
             IsRunning = false;
             _timer?.Dispose();
             _timer = null;
@@ -81,6 +88,7 @@ namespace Slavestefan.Aphrodite.Web.Services
             _lastFire = DateTime.Now;
             _interval = GetNextPostingInterval(config);
             _dbContext.SaveChanges();
+            _logger.LogInformation($"Posted {picCount} Pictures in channel {config.ChannelId} for user {config.UserId}. Next post in {_interval} ms.");
             _timer.Change(_interval, Timeout.Infinite);
         }
 
@@ -95,6 +103,23 @@ namespace Slavestefan.Aphrodite.Web.Services
         public void Dispose()
         {
             _timer?.Dispose();
+        }
+
+        internal void TurnSithOn()
+        {
+            
+        }
+    }
+
+    public struct PostingServiceConfig
+    {
+        public Uri NormalAvatarUrl { get; }
+        public Uri SithAvatarUrl { get; }
+
+        public PostingServiceConfig(string normalAvatarUrl, string sithAvatarUrl)
+        {
+            NormalAvatarUrl = new Uri(normalAvatarUrl);
+            SithAvatarUrl = new Uri(sithAvatarUrl);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Discord;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Slavestefan.Aphrodite.Web.Services;
@@ -10,7 +11,7 @@ namespace Slavestefan.Aphrodite.Web.Logger
     {
         private readonly Bot _bot;
         private readonly DiscordLoggerConfiguration _config;
-        
+        public static LogLevel LogLevel;
 
 
         public DiscordLogger(Bot bot, DiscordLoggerConfiguration config)
@@ -26,12 +27,36 @@ namespace Slavestefan.Aphrodite.Web.Logger
                 return;
             }
 
+            if (eventId == 20101  // EF 
+                || eventId == 10403)
+            {
+                return;
+            }
+
+            var embedBuilder = new EmbedBuilder
+            {
+                Fields = new System.Collections.Generic.List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        IsInline = true,
+                        Name = "EventId",
+                        Value = eventId.Id
+                    },
+                    new EmbedFieldBuilder
+                    {
+                        IsInline = true,
+                        Name = "Timestamp",
+                        Value = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss:ffff")
+                    }
+                }
+            };
             var sendMessage = _bot.SendMessage($"{logLevel.ToString()} - {eventId.Id} - {formatter(state, exception)}", _config.ChannelId);
         }
 
         public bool IsEnabled(LogLevel logLevel)
         {
-            return logLevel == _config.LogLevel;
+            return logLevel <= _config.LogLevel;
         }
 
         public IDisposable BeginScope<TState>(TState state)

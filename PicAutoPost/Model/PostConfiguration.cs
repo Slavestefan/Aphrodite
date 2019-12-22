@@ -18,6 +18,7 @@ namespace Slavestefan.Aphrodite.Model
         public int MaxPostPerInterval { get; set; }
         public DateTime? LastPost { get; set; }
         public bool IsRunning { get; set; }
+        public bool IsInSithMode { get; set; }
         public ulong UserId { get; set; }
     }
 }
