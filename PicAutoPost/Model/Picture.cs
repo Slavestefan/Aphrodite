@@ -12,6 +12,8 @@ namespace Slavestefan.Aphrodite.Model
         public Uri Location { get; set; }
         public string Name { get; set; }
         public byte[] Raw { get; set; }
+        [Required]
+        public byte[] Hash { get; set; }
         public User User { get; set; }
     }
 }

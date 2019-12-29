@@ -19,9 +19,14 @@ namespace Slavestefan.Aphrodite.Web.Services
         private ulong _channelId;
         private CancellationToken _token;
         private Timer _timer;
-        private bool InSithMode;
 
-        public bool IsRunning { get; set; } = false;
+        public bool IsInSithMode
+        {
+            get;
+            private set;
+        }
+
+        public bool IsRunning { get; private set; }
 
         public PostingService(Bot bot, PicAutoPostContext dbContext, RandomService rng, ILogger<PostingService> logger)
         {
@@ -30,12 +35,12 @@ namespace Slavestefan.Aphrodite.Web.Services
             _rng = rng;
             _logger = logger;
         }
-
+        
         public void Start(ulong channelId, CancellationToken cancellationToken)
         {
             IsRunning = true;
             _channelId = channelId;
-            var config = _dbContext.Configurations.First(x => x.ChannelId == channelId);
+            var config = _dbContext.Configurations.AsQueryable().First(x => x.ChannelId == channelId);
             _token = cancellationToken;
             double skip = 0;
             if (config.LastPost != null)
@@ -52,7 +57,7 @@ namespace Slavestefan.Aphrodite.Web.Services
         
         public void Stop()
         {
-            var config = _dbContext.Configurations.First(x => x.ChannelId == _channelId);
+            var config = _dbContext.Configurations.AsQueryable().First(x => x.ChannelId == _channelId);
             config.IsRunning = false;
             _dbContext.SaveChanges();
             _logger.LogInformation($"Autoposting stopped in {config.ChannelId} for user {config.UserId}");
@@ -95,12 +100,22 @@ namespace Slavestefan.Aphrodite.Web.Services
                 _timer.Change(_interval, Timeout.Infinite);
             } catch (Exception ex)
             {
-                _logger.LogError(ex, $"Exception while posting in channel {config.ChannelId} for user {config.UserId}");
+                _logger.LogError(ex, $"Exception while posting in channel {config.ChannelId} for user {config.UserId}: " + ex);
             }
         }
 
         private int GetNextPostingInterval(PostConfiguration config)
-            => _rng.Rng.Next(config.MinPostingIntervalInMinutes * 1000 * 60, config.MaxPostingIntervalInMinutes * 1000 * 60);
+        {
+            if (IsInSithMode)
+            {
+                return _rng.Rng.Next((int) Math.Floor(config.MinPostingIntervalInMinutes * 1000 * 60 * 0.95), config.MaxPostingIntervalInMinutes * 1000 * 60);
+            }
+            else
+            {
+                return _rng.Rng.Next(config.MinPostingIntervalInMinutes * 1000 * 60, config.MaxPostingIntervalInMinutes * 1000 * 60);
+            }
+        }
+            
 
         public TimeSpan GetTimeUntilNextPost()
         {
@@ -114,7 +129,8 @@ namespace Slavestefan.Aphrodite.Web.Services
 
         internal void TurnSithOn()
         {
-            
+            IsInSithMode = true;
+
         }
     }
 

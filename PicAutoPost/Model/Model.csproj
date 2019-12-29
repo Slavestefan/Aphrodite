@@ -1,16 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
     <AssemblyName>Slavestefan.Aphrodite.Model</AssemblyName>
     <RootNamespace>Slavestefan.Aphrodite.Model</RootNamespace>
   </PropertyGroup>
-
+  
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Remove="Migrations\20191222032302_v5.cs" />
     <Compile Remove="Migrations\20191222032302_v5.Designer.cs" />
     <Compile Remove="Migrations\20191222035225_v5.cs" />
     <Compile Remove="Migrations\20191222035225_v5.Designer.cs" />
+    <Compile Remove="Migrations\20191228174839_temp.cs" />
+    <Compile Remove="Migrations\20191228174839_temp.Designer.cs" />
+    <Compile Remove="Migrations\20191228174921_tem.cs" />
+    <Compile Remove="Migrations\20191228174921_tem.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

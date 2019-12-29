@@ -31,6 +31,7 @@ namespace Slavestefan.Aphrodite.Web
             services.AddSingleton<IHostedService>(sp => sp.GetService<Bot>());
             services.AddSingleton<PostingServiceHost>();
             services.AddScoped<PostingService>();
+            services.AddScoped<BotConfigService>();
             services.AddControllersWithViews();
 
         }

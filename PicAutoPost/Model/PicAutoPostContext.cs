@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace Slavestefan.Aphrodite.Model
 {
@@ -21,6 +22,7 @@ namespace Slavestefan.Aphrodite.Model
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<BotConfiguration>().HasIndex(b => new {b.ChannelId, b.Key}).IsUnique();
+            modelBuilder.Entity<Picture>().HasIndex("Hash", "UserIdUser").IsUnique();
         }
     }
 } 

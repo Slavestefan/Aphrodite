@@ -64,7 +64,10 @@ namespace Slavestefan.Aphrodite.Web.Services
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            Debug.WriteLine("Executing");
+            var scope = _serviceProvider.CreateScope();
+            _antiSatinMode = await scope.ServiceProvider.GetRequiredService<BotConfigService>().GetBoolValue(BotConfigKeys.MessWithSatinKey) ?? false;
+            scope.Dispose();
+
             _client.Ready += SetGame;
             _client.Ready += StartPosting;
             _client.Log += Client_Log;
@@ -138,6 +141,9 @@ namespace Slavestefan.Aphrodite.Web.Services
             {
                 _antiSatinMode = !_antiSatinMode;
                 await msg.Channel.SendMessageAsync($"Satin mode {(_antiSatinMode ? "engaged" : "disengaged")}");
+                var scope = _serviceProvider.CreateScope();
+                await scope.ServiceProvider.GetRequiredService<BotConfigService>().SetBoolValue(BotConfigKeys.MessWithSatinKey, _antiSatinMode);
+                scope.Dispose();
                 return;
             }
 

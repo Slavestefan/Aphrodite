@@ -11,8 +11,6 @@ namespace Slavestefan.Aphrodite.Web.Logger
     {
         private readonly Bot _bot;
         private readonly DiscordLoggerConfiguration _config;
-        public static LogLevel LogLevel;
-
 
         public DiscordLogger(Bot bot, DiscordLoggerConfiguration config)
         {
@@ -51,12 +49,13 @@ namespace Slavestefan.Aphrodite.Web.Logger
                     }
                 }
             };
+            var output = formatter(state, exception).Replace("`", string.Empty);
             var sendMessage = _bot.SendMessage($"{logLevel.ToString()} - {eventId.Id} - {formatter(state, exception)}", _config.ChannelId);
         }
 
         public bool IsEnabled(LogLevel logLevel)
         {
-            return logLevel <= _config.LogLevel;
+            return logLevel >= _config.LogLevel;
         }
 
         public IDisposable BeginScope<TState>(TState state)
@@ -74,13 +73,13 @@ namespace Slavestefan.Aphrodite.Web.Logger
 
     public class DiscordLoggerProvider : ILoggerProvider
     {
-        private readonly DiscordLoggerConfiguration _config;
+        public static DiscordLoggerConfiguration Config;
         private readonly IServiceProvider _services;
         private readonly ConcurrentDictionary<string, DiscordLogger> _loggers = new ConcurrentDictionary<string, DiscordLogger>();
 
         public DiscordLoggerProvider(DiscordLoggerConfiguration config, IServiceProvider services)
         {
-            _config = config;
+            Config = config;
             _services = services;
         }
 
@@ -91,7 +90,7 @@ namespace Slavestefan.Aphrodite.Web.Logger
 
         public ILogger CreateLogger(string categoryName)
         {
-            return _loggers.GetOrAdd(categoryName, name => new DiscordLogger(_services.GetService<Bot>(), _config));
+            return _loggers.GetOrAdd(categoryName, name => new DiscordLogger(_services.GetService<Bot>(), Config));
         }
     }
 }

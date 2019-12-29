@@ -12,17 +12,20 @@ namespace Slavestefan.Aphrodite.Web.Modules
             get;
         }
 
-        private readonly IServiceScope _scope;
+        protected IServiceScope Scope
+        {
+            get;
+        }
 
         public DbModuleBase(IServiceProvider services)
         {
-            _scope = services.CreateScope();
-            TypedDbContext = _scope.ServiceProvider.GetRequiredService<TDbContext>();
+            Scope = services.CreateScope();
+            TypedDbContext = Scope.ServiceProvider.GetRequiredService<TDbContext>();
         }
 
         public void Dispose()
         {
-            _scope.Dispose();
+            Scope.Dispose();
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Slavestefan.Aphrodite.Web.Services
         {
             using var scope = _services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<PicAutoPostContext>();
-            var configs = dbContext.Configurations.Where(x => x.IsRunning);
+            var configs = dbContext.Configurations.AsQueryable().Where(x => x.IsRunning);
             var logger = scope.ServiceProvider.GetService<ILogger<PostingServiceHost>>();
             logger.LogInformation($"Resuming {configs.Count()} autoposters after restart");
             foreach (var config in configs)
@@ -74,6 +74,9 @@ namespace Slavestefan.Aphrodite.Web.Services
         {
             return _postingServices.Select(x => (x.Key, x.Value.Service.IsRunning, x.Value.Service.GetTimeUntilNextPost())).ToList();
         }
+
+        public bool IsPosting(ulong channelId)
+            => _postingServices.ContainsKey(channelId);
 
         public void Dispose()
         {

@@ -16,6 +16,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
         private readonly PostingServiceHost _postingHost;
         private readonly ILogger<StartStopModule> _logger;
 
+
         public StartStopModule(IServiceProvider services, PostingServiceHost postingHost, ILogger<StartStopModule> logger) : base(services)
         {
             _postingHost = postingHost;
@@ -28,7 +29,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
         {
             _logger.LogDebug($"Start ");
             channelId ??= Context.Channel.Id;
-            var config = TypedDbContext.Configurations.FirstOrDefault(x => x.ChannelId == channelId && x.UserId == Context.Message.Author.Id);
+            var config = await TypedDbContext.Configurations.FirstOrDefaultAsync(x => x.ChannelId == channelId && x.UserId == Context.Message.Author.Id);
 
             if (config?.IsRunning == true)
             {
@@ -106,7 +107,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
         }
 
         [Command("Sith on")]
-        public async Task ToggleSith(ulong? channelId = null)
+        public async Task StartSith(ulong? channelId = null)
         {
             channelId ??= Context.Channel.Id;
 
@@ -123,6 +124,8 @@ namespace Slavestefan.Aphrodite.Web.Modules
                 await Context.Channel.SendMessageAsync($"```Use \"!ap start {channelId}\" to start me first```");
                 return;
             }
+
+            config.IsInSithMode = true;
         }
     }
 }
