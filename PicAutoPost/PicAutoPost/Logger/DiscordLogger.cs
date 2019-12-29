@@ -50,7 +50,7 @@ namespace Slavestefan.Aphrodite.Web.Logger
                 }
             };
             var output = formatter(state, exception).Replace("`", string.Empty);
-            var sendMessage = _bot.SendMessage($"{logLevel.ToString()} - {eventId.Id} - {formatter(state, exception)}", _config.ChannelId);
+            var sendMessage = _bot.SendMessage($"{logLevel.ToString()} - {eventId.Id} - {formatter(state, exception)} - {exception}", _config.ChannelId);
         }
 
         public bool IsEnabled(LogLevel logLevel)

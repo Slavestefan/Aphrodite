@@ -157,8 +157,8 @@ namespace Slavestefan.Aphrodite.Web.Services
 
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
-            _keepAlive.Dispose();
-            _changeGameTimer.Dispose();
+            _keepAlive?.Dispose();
+            _changeGameTimer?.Dispose();
 
 
             await Client.LogoutAsync();
