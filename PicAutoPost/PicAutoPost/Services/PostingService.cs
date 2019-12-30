@@ -58,7 +58,6 @@ namespace Slavestefan.Aphrodite.Web.Services
         public void Stop()
         {
             var config = _dbContext.Configurations.AsQueryable().First(x => x.ChannelId == _channelId);
-            config.IsRunning = false;
             _dbContext.SaveChanges();
             _logger.LogInformation($"Autoposting stopped in {config.ChannelId} for user {config.UserId}");
             IsRunning = false;

@@ -22,14 +22,23 @@ namespace Slavestefan.Aphrodite.Web.Services
 
         internal void StartupPosting()
         {
-            using var scope = _services.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<PicAutoPostContext>();
-            var configs = dbContext.Configurations.AsQueryable().Where(x => x.IsRunning);
-            var logger = scope.ServiceProvider.GetService<ILogger<PostingServiceHost>>();
-            logger.LogInformation($"Resuming {configs.Count()} autoposters after restart");
-            foreach (var config in configs)
+            try
             {
-                StartPostingService(config);
+                using var scope = _services.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<PicAutoPostContext>();
+                var configs = dbContext.Configurations.AsQueryable().Where(x => x.IsRunning);
+                var logger = scope.ServiceProvider.GetService<ILogger<PostingServiceHost>>();
+                logger.LogInformation($"Resuming {configs.Count()} autoposters after restart");
+                foreach (var config in configs)
+                {
+                    StartPostingService(config);
+                }
+            }
+            catch (Exception ex)
+            {
+                using var scope = _services.CreateScope();
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<Bot>>();
+                logger.LogError("Error resuming autoposting at startup: " + ex);
             }
         }
 

@@ -81,7 +81,7 @@ namespace Slavestefan.Aphrodite.Web.Logger
 
     public class DiscordLoggerConfiguration
     {
-        public LogLevel LogLevel { get; set; } = LogLevel.Warning;
+        public LogLevel LogLevel { get; set; } = LogLevel.Information;
         public int EventId { get; set; } = 0;
         public ulong ChannelId { get; set; }        
     }

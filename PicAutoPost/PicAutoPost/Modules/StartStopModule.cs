@@ -104,6 +104,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
 
             _postingHost.StopPostingService(Context.Channel.Id);
             await ReplyAsync("```Autoposting stopped```");
+            _logger.LogInformation($"Autoposting stopped via command in channel {channelId} by user {Context.Message.Author.Id}");
         }
 
         [Command("Sith on")]

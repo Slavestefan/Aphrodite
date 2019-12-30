@@ -11,6 +11,7 @@ using Discord.Commands;
 using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Slavestefan.Aphrodite.Model;
 using Slavestefan.Aphrodite.Web.Constants;
 
@@ -68,10 +69,6 @@ namespace Slavestefan.Aphrodite.Web.Services
             _antiSatinMode = await scope.ServiceProvider.GetRequiredService<BotConfigService>().GetBoolValue(BotConfigKeys.MessWithSatinKey) ?? false;
             scope.Dispose();
 
-            _client.Ready += SetGame;
-            _client.Ready += StartPosting;
-            _client.Log += Client_Log;
-            _client.MessageReceived += Client_MessageReceived;
             _stopExecutionToken = cancellationToken;
             await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(),
                 services: _serviceProvider);
@@ -87,8 +84,18 @@ namespace Slavestefan.Aphrodite.Web.Services
 
         private Task StartPosting()
         {
-            var postingService = _serviceProvider.GetService<PostingServiceHost>();
-            postingService.StartupPosting();
+            try
+            {
+                var postingService = _serviceProvider.GetService<PostingServiceHost>();
+                postingService.StartupPosting();
+            }
+            catch (Exception ex)
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var logger = scope.ServiceProvider.GetRequiredService<ILogger<Bot>>();
+                logger.LogError("Error resuming autoposting at startup: " + ex);
+            }
+
             return Task.CompletedTask;
         }
 
@@ -113,6 +120,10 @@ namespace Slavestefan.Aphrodite.Web.Services
 
         public override async Task StartAsync(CancellationToken cancellationToken)
         {
+            _client.Ready += SetGame;
+            _client.Ready += StartPosting;
+            _client.Log += Client_Log;
+            _client.MessageReceived += Client_MessageReceived;
             await _client.LoginAsync(Discord.TokenType.Bot, _botToken);
             await _client.StartAsync();
             await base.StartAsync(cancellationToken);

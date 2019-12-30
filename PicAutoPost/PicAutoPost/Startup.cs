@@ -58,7 +58,7 @@ namespace Slavestefan.Aphrodite.Web
             loggerFactory.AddProvider(new DiscordLoggerProvider(new DiscordLoggerConfiguration
             {
                 ChannelId = Configuration.GetSection("Logging").GetValue<ulong>("DiscordLogChannel"),
-                LogLevel = LogLevel.Warning
+                LogLevel = LogLevel.Information
             }, app.ApplicationServices));
             app.UseAuthorization();
 
