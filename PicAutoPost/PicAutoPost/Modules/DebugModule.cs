@@ -16,11 +16,13 @@ namespace Slavestefan.Aphrodite.Web.Modules
     {
         private readonly Bot _bot;
         private readonly PostingServiceHost _postingServiceHost;
+        private readonly ILogger<DebugModule> _logger;
 
-        public DebugModule(IServiceProvider services, Bot bot, PostingServiceHost postingServiceHost) : base(services)
+        public DebugModule(IServiceProvider services, Bot bot, PostingServiceHost postingServiceHost, ILogger<DebugModule>  logger) : base(services)
         {
             _bot = bot;
             _postingServiceHost = postingServiceHost;
+            _logger = logger;
         }
 
         [Command("Status")]
@@ -29,7 +31,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
             var postingServiceStatus = _postingServiceHost.GetPostingServiceStatus();
 
             await ReplyAsync($"```Currently running {postingServiceStatus.Count} services: \n{string.Join(Environment.NewLine, postingServiceStatus.Select(x => $"ChannelId: {x.Item1}, ChannelName: {_bot.GetChannelNameFromSnowflake(x.Item1)}, Running: {x.Item2}, Timer: about {x.Item3.TotalMinutes} Minutes"))}```")
-                    .ContinueWith(x => ReplyAsync($"```{TypedDbContext.Pictures.Count()} pictures in store.```"))
+                    .ContinueWith(x => ReplyAsync($"```{TypedDbContext.Pictures.AsQueryable().Count()} pictures in store.```"))
                     .ContinueWith(x => ReplyAsync($"```LogLevel: {DiscordLoggerProvider.Config.LogLevel}```"));
         }
 
@@ -38,6 +40,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
         {
             DiscordLoggerProvider.Config.LogLevel = (LogLevel)level;
             await ReplyAsync($"```Log level set to {DiscordLoggerProvider.Config.LogLevel}```");
+            _logger.LogInformation($"Log level changed to {DiscordLoggerProvider.Config.LogLevel} by {Context.User.Id}");
         }
     }
 }

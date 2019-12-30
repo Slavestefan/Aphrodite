@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using Discord;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -31,31 +32,45 @@ namespace Slavestefan.Aphrodite.Web.Logger
                 return;
             }
 
-            var embedBuilder = new EmbedBuilder
-            {
-                Fields = new System.Collections.Generic.List<EmbedFieldBuilder>
-                {
-                    new EmbedFieldBuilder
-                    {
-                        IsInline = true,
-                        Name = "EventId",
-                        Value = eventId.Id
-                    },
-                    new EmbedFieldBuilder
-                    {
-                        IsInline = true,
-                        Name = "Timestamp",
-                        Value = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss:ffff")
-                    }
-                }
-            };
             var output = formatter(state, exception).Replace("`", string.Empty);
-            var sendMessage = _bot.SendMessage($"{logLevel.ToString()} - {eventId.Id} - {formatter(state, exception)} - {exception}", _config.ChannelId);
+            var embed = new EmbedBuilder
+            {
+                Fields = new List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder {Name = "Timestamp", Value = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss:fff"), IsInline = true},
+                    new EmbedFieldBuilder {Name = "LogLevel", Value = logLevel.ToString(), IsInline = true},
+                    new EmbedFieldBuilder {Name = "Event", Value = $"{eventId.Id} - {eventId.Name}", IsInline = true},
+                    new EmbedFieldBuilder {Name = "Message", Value = formatter(state, exception), IsInline = true},
+                },
+                Color = GetColorByLogLevel(logLevel),
+            };
+            var sendMessage = _bot.SendMessage(string.Empty, _config.ChannelId, embed.Build());
         }
 
         public bool IsEnabled(LogLevel logLevel)
         {
             return logLevel >= _config.LogLevel;
+        }
+
+        private Color GetColorByLogLevel(LogLevel logLevel)
+        {
+            switch (logLevel)
+            {
+                case LogLevel.Trace:
+                case LogLevel.Debug:
+                    return new Color(0, 0, 255);
+                case LogLevel.Information:
+                    return new Color(0, 255, 0);
+                case LogLevel.Warning:
+                    return new Color(0, 255, 255);
+                case LogLevel.Error:
+                case LogLevel.Critical:
+                    return new Color(255, 0, 0);
+                case LogLevel.None:
+                    return new Color(0, 0, 0);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);
+            }
         }
 
         public IDisposable BeginScope<TState>(TState state)
