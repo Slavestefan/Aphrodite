@@ -32,6 +32,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
 
 
                 _logger.LogDebug("Add Pic called by user " + Context.Message.Author.Id);
+
                 if (!(Context.Message.Embeds.Any() || Context.Message.Attachments.Any()))
                 {
                     await ReplyAsync("```No picture found```");

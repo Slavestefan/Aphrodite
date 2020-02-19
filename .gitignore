@@ -343,3 +343,5 @@ healthchecksdb
 
 PicAutoPost/PicAutoPost/appsettings.production.json
 PicAutoPost/PicAutoPost/appsettings.development.json
+
+logs/

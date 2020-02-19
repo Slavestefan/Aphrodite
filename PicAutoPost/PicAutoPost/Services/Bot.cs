@@ -221,6 +221,16 @@ namespace Slavestefan.Aphrodite.Web.Services
             }
         }
 
+        internal async Task SendRawMessage(string message, ulong channelId, Embed embed = null)
+        {
+            if (!(_client.GetChannel(channelId) is ISocketMessageChannel channel))
+            {
+                throw new ArgumentException($"Channel {channelId} not found");
+            }
+
+            await channel.SendMessageAsync(message, embed: embed);
+        }
+
         public string GetChannelNameFromSnowflake(ulong channelId)
         {
             var channel = _client.GetChannel(channelId) as SocketGuildChannel;

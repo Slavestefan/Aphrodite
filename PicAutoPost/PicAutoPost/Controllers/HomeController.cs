@@ -16,6 +16,11 @@ namespace Slavestefan.Aphrodite.Web.Controllers
 
         public IActionResult Index()
         {
+            if (Constants.Urls.BaseAppUrl == null)
+            {
+                Constants.Urls.BaseAppUrl = $"{this.Request.Scheme}://{this.Request.Host}{this.Request.PathBase}";
+            }
+
             return View();
         }
 

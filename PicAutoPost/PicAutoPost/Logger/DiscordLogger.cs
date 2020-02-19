@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using Discord;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Slavestefan.Aphrodite.Web.Services;
 
@@ -12,11 +15,13 @@ namespace Slavestefan.Aphrodite.Web.Logger
     {
         private readonly Bot _bot;
         private readonly DiscordLoggerConfiguration _config;
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-        public DiscordLogger(Bot bot, DiscordLoggerConfiguration config)
+        public DiscordLogger(Bot bot, DiscordLoggerConfiguration config, IWebHostEnvironment hostingEnvironment)
         {
             _bot = bot;
             _config = config;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
@@ -32,19 +37,36 @@ namespace Slavestefan.Aphrodite.Web.Logger
                 return;
             }
 
-            var output = formatter(state, exception).Replace("`", string.Empty);
+            var message = formatter(state, exception).Replace("`", string.Empty);
+            string path = null;
+            if (message.Length > 1024)
+            {
+                path = @$"logs\StackTrace-{DateTime.UtcNow:yyyyMMddHHmmssfff}.txt";
+                File.WriteAllText(_hostingEnvironment.WebRootPath +"\\" + path, message);
+                message = message.Substring(0, 1024);
+            }
+
             var embed = new EmbedBuilder
             {
                 Fields = new List<EmbedFieldBuilder>
                 {
-                    new EmbedFieldBuilder {Name = "Timestamp", Value = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss:fff"), IsInline = true},
+                    new EmbedFieldBuilder {Name = "UTC Timestamp", Value = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss:fff"), IsInline = true},
                     new EmbedFieldBuilder {Name = "LogLevel", Value = logLevel.ToString(), IsInline = true},
                     new EmbedFieldBuilder {Name = "Event", Value = $"{eventId.Id} - {eventId.Name}", IsInline = true},
-                    new EmbedFieldBuilder {Name = "Message", Value = formatter(state, exception), IsInline = true},
+                    new EmbedFieldBuilder {Name = "Message", Value = message, IsInline = true},
                 },
                 Color = GetColorByLogLevel(logLevel),
             };
-            var sendMessage = _bot.SendMessage(string.Empty, _config.ChannelId, embed.Build());
+            
+            if (path != null)
+            {
+                embed.Fields.Add(new EmbedFieldBuilder()
+                {
+                    Name = "FullMessage", Value = Constants.Urls.BaseAppUrl +"/" +  path.Replace("\\", "/")
+                });
+            }
+
+            var sendMessage = _bot.SendRawMessage(logLevel >= LogLevel.Warning ? $"Hey! Listen! <@{Constants.Users.Slavestefan}>" : string.Empty, _config.ChannelId, embed.Build());
         }
 
         public bool IsEnabled(LogLevel logLevel)
@@ -90,12 +112,14 @@ namespace Slavestefan.Aphrodite.Web.Logger
     {
         public static DiscordLoggerConfiguration Config;
         private readonly IServiceProvider _services;
+        private readonly IWebHostEnvironment _hostingEnvironment;
         private readonly ConcurrentDictionary<string, DiscordLogger> _loggers = new ConcurrentDictionary<string, DiscordLogger>();
 
-        public DiscordLoggerProvider(DiscordLoggerConfiguration config, IServiceProvider services)
+        public DiscordLoggerProvider(DiscordLoggerConfiguration config, IServiceProvider services, IWebHostEnvironment hostingEnvironment)
         {
             Config = config;
             _services = services;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public void Dispose()
@@ -105,7 +129,7 @@ namespace Slavestefan.Aphrodite.Web.Logger
 
         public ILogger CreateLogger(string categoryName)
         {
-            return _loggers.GetOrAdd(categoryName, name => new DiscordLogger(_services.GetService<Bot>(), Config));
+            return _loggers.GetOrAdd(categoryName, name => new DiscordLogger(_services.GetService<Bot>(), Config, _hostingEnvironment));
         }
     }
 }

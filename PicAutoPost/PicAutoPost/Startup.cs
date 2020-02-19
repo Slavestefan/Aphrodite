@@ -58,8 +58,8 @@ namespace Slavestefan.Aphrodite.Web
             loggerFactory.AddProvider(new DiscordLoggerProvider(new DiscordLoggerConfiguration
             {
                 ChannelId = Configuration.GetSection("Logging").GetValue<ulong>("DiscordLogChannel"),
-                LogLevel = LogLevel.Information
-            }, app.ApplicationServices));
+                LogLevel = LogLevel.Information,
+            }, app.ApplicationServices, env));
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
