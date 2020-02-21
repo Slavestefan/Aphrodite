@@ -137,9 +137,9 @@ namespace Slavestefan.Aphrodite.Web.Services
 
         private async Task Client_MessageReceived(SocketMessage message)
         {
-            if (message.Author.Id == 474751258834501633 && _antiSatinMode && message.Content.ToLower().Contains("aphrodite"))
+            if (message.Author.Id == Users.PrincessSatin && _antiSatinMode && message.Content.ToLower().Contains("aphrodite"))
             {
-                await MessWithSatin(message);
+                await MessWithSatin(message);   
                 return;
             }
 

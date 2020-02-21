@@ -29,8 +29,6 @@ namespace Slavestefan.Aphrodite.Web.Modules
         {
             try
             {
-
-
                 _logger.LogDebug("Add Pic called by user " + Context.Message.Author.Id);
 
                 if (!(Context.Message.Embeds.Any() || Context.Message.Attachments.Any()))
