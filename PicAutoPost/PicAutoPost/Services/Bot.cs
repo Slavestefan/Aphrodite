@@ -14,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Slavestefan.Aphrodite.Model;
 using Slavestefan.Aphrodite.Web.Constants;
+using Slavestefan.Aphrodite.Web.MessageHandler;
 
 namespace Slavestefan.Aphrodite.Web.Services
 {
@@ -28,6 +29,7 @@ namespace Slavestefan.Aphrodite.Web.Services
         private readonly Dictionary<ulong, (PostingService Service, IServiceScope Scope, CancellationTokenSource Token)> _postingServices = new Dictionary<ulong, (PostingService, IServiceScope, CancellationTokenSource)>();
         private Timer _changeGameTimer;
         private Timer _keepAlive;
+        private DrivebyHandler _drivebyHandler = new DrivebyHandler();
         private CancellationToken _stopExecutionToken;
 
         public Bot(IServiceProvider serviceProvider, string botToken)
@@ -140,6 +142,12 @@ namespace Slavestefan.Aphrodite.Web.Services
             if (message.Author.Id == Users.PrincessSatin && _antiSatinMode && message.Content.ToLower().Contains("aphrodite"))
             {
                 await MessWithSatin(message);   
+                return;
+            }
+
+            if(_drivebyHandler.WantsToHandle(message))
+            {
+                await _drivebyHandler.Handle(message);
                 return;
             }
 
