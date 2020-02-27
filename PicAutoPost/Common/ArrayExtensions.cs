@@ -17,7 +17,7 @@ namespace Slavestefan.Aphrodite.Common
         /// </summary>
         public static T GetRandom<T>(this T[] source, Random rng)
         {
-            return source[rng.Next(0, source.Length - 1)];
+            return source[rng.Next(0, source.Length)];
         }
     }
 }
