@@ -133,8 +133,8 @@ namespace Slavestefan.Aphrodite.Web.Services
 
         private async Task MessWithSatin(SocketMessage message)
         {
-            var index = _rng.Next(0, Constants.MessingPhrases.Satin.Length);
-            await message.Channel.SendMessageAsync($"```{MessingPhrases.Satin[index]}```");
+            var index = _rng.Next(0, Constants.Phrases.Satin.Length);
+            await message.Channel.SendMessageAsync($"```{Phrases.Satin[index]}```");
         }
 
         private async Task Client_MessageReceived(SocketMessage message)
