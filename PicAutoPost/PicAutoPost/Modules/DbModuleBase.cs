@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,5 +29,28 @@ namespace Slavestefan.Aphrodite.Web.Modules
         {
             Scope.Dispose();
         }
+
+        public async Task ReplySimpleEmbedAsync(string message, Color? color = null)
+        {
+            var embed = new EmbedBuilder
+            {
+                Color = color,
+                Fields = new System.Collections.Generic.List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        IsInline = true,
+                        Value = message
+                    }
+                },
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = $"Request by " + Context.User.Mention
+                }
+            };
+
+            await ReplyAsync(embed: embed.Build());
+        }
+
     }
 }

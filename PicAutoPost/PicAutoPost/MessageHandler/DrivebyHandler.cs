@@ -6,12 +6,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
+using Microsoft.Extensions.Logging;
 using Slavestefan.Aphrodite.Common;
 using Slavestefan.Aphrodite.Web.Constants;
 
 namespace Slavestefan.Aphrodite.Web.MessageHandler
 {
-    public class DrivebyHandler : IMessageHandler
+    public class DrivebyHandler : MessageHandlerBase
     {
         private static readonly IEmote[] MainPostEmotes =
         {
@@ -30,7 +31,11 @@ namespace Slavestefan.Aphrodite.Web.MessageHandler
 
         private readonly ConcurrentDictionary<ulong, bool> _activeChannels = new ConcurrentDictionary<ulong,bool>();
 
-        public bool WantsToHandle(SocketMessage message)
+        public DrivebyHandler(ILogger<DrivebyHandler> logger) : base(logger)
+        {
+        }
+
+        public override bool WantsToHandle(SocketMessage message)
             => WantsToHandle(message as IUserMessage);
 
         public bool WantsToHandle(IUserMessage message)
@@ -65,27 +70,33 @@ namespace Slavestefan.Aphrodite.Web.MessageHandler
         }
 
 
-        public async Task<bool> Handle(SocketMessage message)
+        protected override async Task<bool> HandleWithExceptionHandling(SocketMessage message)
         {
             var userMessage = message as IUserMessage;
             if (userMessage == null)
             {
                 throw new ArgumentException("Message must be of type UserMessage", nameof(message));
             }
-
-            if (IsMissedMessage(userMessage))
+            try
             {
-                await userMessage.AddReactionAsync(MainPostEmotes.GetRandom());
-                var updated = _activeChannels.AddOrUpdate(userMessage.Channel.Id, true, (x, y) => true);
-                RemoveAfterWait(userMessage.Channel.Id);
-                return true;
-            }
+                if (IsMissedMessage(userMessage))
+                {
+                    await userMessage.AddReactionAsync(MainPostEmotes.GetRandom());
+                    var updated = _activeChannels.AddOrUpdate(userMessage.Channel.Id, true, (x, y) => true);
+                    RemoveAfterWait(userMessage.Channel.Id);
+                    return true;
+                }
 
-            if (IsSobMessage(userMessage))
+                if (IsSobMessage(userMessage))
+                {
+                    await userMessage.AddReactionAsync(ReactionEmotes.GetRandom());
+                    return true;
+                }
+            }
+            catch (Exception ex)
             {
-                await userMessage.AddReactionAsync(ReactionEmotes.GetRandom());
+                throw new Exception($"Failed to handle message {message.Content} by {message.Author.Id} in {message.Channel.Id}", ex);
             }
-
             return false;
         }
 

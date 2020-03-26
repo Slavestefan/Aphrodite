@@ -29,7 +29,7 @@ namespace Slavestefan.Aphrodite.Web.Services
         private readonly Dictionary<ulong, (PostingService Service, IServiceScope Scope, CancellationTokenSource Token)> _postingServices = new Dictionary<ulong, (PostingService, IServiceScope, CancellationTokenSource)>();
         private Timer _changeGameTimer;
         private Timer _keepAlive;
-        private DrivebyHandler _drivebyHandler = new DrivebyHandler();
+        private DrivebyHandler _drivebyHandler;
         private CancellationToken _stopExecutionToken;
 
         public Bot(IServiceProvider serviceProvider, string botToken)
@@ -69,13 +69,14 @@ namespace Slavestefan.Aphrodite.Web.Services
         {
             var scope = _serviceProvider.CreateScope();
             _antiSatinMode = await scope.ServiceProvider.GetRequiredService<BotConfigService>().GetBoolValue(BotConfigKeys.MessWithSatinKey) ?? false;
+            _drivebyHandler = new DrivebyHandler(scope.ServiceProvider.GetRequiredService<ILogger<DrivebyHandler>>());
             scope.Dispose();
 
             _stopExecutionToken = cancellationToken;
             await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(),
                 services: _serviceProvider);
 
-            _keepAlive = new Timer(KeepAlive, null, 5 * 60 * 1000, 5 * 60 * 1000);
+            _keepAlive = new Timer(KeepAlive, null, 3 * 60 * 1000, 3 * 60 * 1000);
             _changeGameTimer = new Timer(SetGame, null, 30*60*1000, 29 * 60 * 1000);
 
             while (!_stopExecutionToken.IsCancellationRequested)

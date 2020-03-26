@@ -7,18 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="wwwroot\logs\StackTrace-20200219092549902.txt" />
-    <Content Remove="wwwroot\logs\StackTrace-20200221220238842.txt" />
-    <Content Remove="wwwroot\logs\StackTrace-20200221220238908.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="wwwroot\logs\StackTrace-20200219092549902.txt" />
-    <None Include="wwwroot\logs\StackTrace-20200221220238842.txt" />
-    <None Include="wwwroot\logs\StackTrace-20200221220238908.txt" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Discord.Net" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.AzureAppServices.HostingStartup" Version="3.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.0" />
@@ -33,6 +21,10 @@
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\Model\Model.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\logs\" />
   </ItemGroup>
 
 </Project>
