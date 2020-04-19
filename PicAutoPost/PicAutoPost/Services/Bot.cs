@@ -76,7 +76,7 @@ namespace Slavestefan.Aphrodite.Web.Services
             await _commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(),
                 services: _serviceProvider);
 
-            _keepAlive = new Timer(KeepAlive, null, 3 * 60 * 1000, 3 * 60 * 1000);
+            _keepAlive = new Timer(KeepAlive, null, 1 * 60 * 1000, 1 * 60 * 1000);
             _changeGameTimer = new Timer(SetGame, null, 30*60*1000, 29 * 60 * 1000);
 
             while (!_stopExecutionToken.IsCancellationRequested)
