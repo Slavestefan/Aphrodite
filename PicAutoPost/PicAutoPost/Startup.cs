@@ -8,6 +8,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Slavestefan.Aphrodite.Model;
 using Slavestefan.Aphrodite.Web.Logger;
+using Slavestefan.Aphrodite.Web.Options;
 using Slavestefan.Aphrodite.Web.Services;
 
 namespace Slavestefan.Aphrodite.Web
@@ -33,6 +34,7 @@ namespace Slavestefan.Aphrodite.Web
             services.AddScoped<PostingService>();
             services.AddScoped<BotConfigService>();
             services.AddControllersWithViews();
+            services.Configure<SayOptions>(o => o.SayChannelId = Configuration.GetValue<ulong>("SayChannelId"));
 
         }
 

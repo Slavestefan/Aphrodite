@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Slavestefan.Aphrodite.Model
+namespace Slavestefan.Aphrodite.Model.Users
 {
     public class User
     {

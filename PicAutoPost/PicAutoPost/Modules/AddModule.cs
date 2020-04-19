@@ -8,6 +8,7 @@ using Discord.Commands;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Slavestefan.Aphrodite.Model;
+using Slavestefan.Aphrodite.Model.Users;
 
 namespace Slavestefan.Aphrodite.Web.Modules
 {

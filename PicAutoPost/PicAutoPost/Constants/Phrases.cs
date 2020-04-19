@@ -6,7 +6,7 @@ namespace Slavestefan.Aphrodite.Web.Constants
 {
     public static class Phrases
     {
-        public static string[] Satin { get; } = 
+        public static string[] SatinReactions { get; } = 
         {
             "Shoo Satin",
             "Not now Satin, I'm busy preparing my next evil scheme",

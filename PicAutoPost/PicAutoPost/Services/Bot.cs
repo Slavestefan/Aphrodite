@@ -134,8 +134,8 @@ namespace Slavestefan.Aphrodite.Web.Services
 
         private async Task MessWithSatin(SocketMessage message)
         {
-            var index = _rng.Next(0, Constants.Phrases.Satin.Length);
-            await message.Channel.SendMessageAsync($"```{Phrases.Satin[index]}```");
+            var index = _rng.Next(0, Constants.Phrases.SatinReactions.Length);
+            await message.Channel.SendMessageAsync($"```{Phrases.SatinReactions[index]}```");
         }
 
         private async Task Client_MessageReceived(SocketMessage message)
@@ -203,6 +203,7 @@ namespace Slavestefan.Aphrodite.Web.Services
             }
         }
 
+        [Obsolete("Use SendMessageAsEmbed instead")]
         internal async Task SendMessage(string message, ulong channelId, Embed embed = null)
         {
             if (!(_client.GetChannel(channelId) is ISocketMessageChannel channel))
@@ -230,6 +231,29 @@ namespace Slavestefan.Aphrodite.Web.Services
             }
         }
 
+        internal async Task SendMessageAsEmbed(string message, ulong channelId)
+        {
+            if (!(_client.GetChannel(channelId) is ISocketMessageChannel channel))
+            {
+                throw new ArgumentException($"Channel {channelId} not found");
+            }
+
+            var embed = new EmbedBuilder
+            {
+                Description = message,
+                Fields = new List<EmbedFieldBuilder>()
+                {
+                    new EmbedFieldBuilder
+                    {
+                        Name = string.Empty,
+                        Value = message
+                    }
+                }
+            };
+
+            await channel.SendMessageAsync(string.Empty, embed: embed.Build());
+        }
+
         internal async Task SendRawMessage(string message, ulong channelId, Embed embed = null)
         {
             if (!(_client.GetChannel(channelId) is ISocketMessageChannel channel))
@@ -249,6 +273,25 @@ namespace Slavestefan.Aphrodite.Web.Services
             }
 
             return channel.Name;
+        }
+
+        public ulong? GuesstimateUser(string name, ulong channelId)
+        {
+            if (!(_client.GetChannel(channelId) is SocketGuildChannel channel))
+            {
+                throw new ArgumentException($"Channel {channelId} not found");
+            }
+
+            var users = channel.Users.Where(x => x.Username.Contains(name, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (users.Count == 1)
+            {
+                return users[0].Id;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }
