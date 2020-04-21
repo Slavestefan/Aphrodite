@@ -35,7 +35,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
             try
             {
                 var channelId = _options.CurrentValue.SayChannelId;
-                var mentiontokens = message.Split(' ').Where(x => x[0] == '@').Where(x => !string.Equals(x, "@everyone", StringComparison.OrdinalIgnoreCase));
+                var mentiontokens = message.Split(' ').Where(x => !string.IsNullOrEmpty(x) && x[0] == '@').Where(x => !string.Equals(x, "@everyone", StringComparison.OrdinalIgnoreCase));
                 var mentionReplacePairs = mentiontokens.Select(x => new {Replacable = x, UserSnowflake = _bot.GuesstimateUser(x.Trim('@'), channelId)}).ToList();
                 bool notFound = false;
                 foreach (var alias in mentionReplacePairs)

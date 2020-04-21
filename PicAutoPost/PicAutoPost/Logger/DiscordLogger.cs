@@ -32,7 +32,10 @@ namespace Slavestefan.Aphrodite.Web.Logger
             }
 
             if (eventId == 20101  // EF 
-                || eventId == 10403)
+                || eventId == 10403
+                || eventId == 20001 // EF Connection open
+                || eventId == 20002 // EF Connection close
+                || eventId == 20003) // EF Connection closed
             {
                 return;
             }
