@@ -1,5 +1,7 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Discord.Commands;
 using Microsoft.Extensions.Logging;
@@ -41,6 +43,13 @@ namespace Slavestefan.Aphrodite.Web.Modules
             DiscordLoggerProvider.Config.LogLevel = (LogLevel)level;
             await ReplyAsync($"```Log level set to {DiscordLoggerProvider.Config.LogLevel}```");
             _logger.LogInformation($"Log level changed to {DiscordLoggerProvider.Config.LogLevel} by {Context.User.Id}");
+        }
+
+        [Command("Version")]
+        public async Task GetVersion()
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            await ReplyAsync($"Running version {assembly.GetName().Version} build date {new FileInfo(assembly.Location).CreationTimeUtc:yyyy-MM-dd} running in CLR Version {assembly.ImageRuntimeVersion} ");
         }
     }
 }

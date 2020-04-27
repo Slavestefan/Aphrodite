@@ -13,9 +13,7 @@ using Slavestefan.Aphrodite.Web.Services;
 
 namespace Slavestefan.Aphrodite.Web.Modules
 {
-#if !DEBUG
-    [RequireUserPrecondition(new[] { Constants.Users.EmpressKatie})]
-#endif
+    [RequireUserPrecondition(new[] { Constants.Users.EmpressKatie, Constants.Users.Slavestefan})]
     public class SayModule : AphroditeModuleBase
     {
         private readonly IOptionsMonitor<SayOptions> _options;
@@ -56,7 +54,9 @@ namespace Slavestefan.Aphrodite.Web.Modules
                 }
                 else
                 {
-                    await ReplyAsync($"Could not find user with name(s) {string.Join(',', mentionReplacePairs.Where(x => x.UserSnowflake == null).Select(x => x.Replacable))}");
+                    var answer = $"Could not find user with name(s) {string.Join(',', mentionReplacePairs.Where(x => x.UserSnowflake == null).Select(x => x.Replacable))}";
+                    await ReplyAsync(answer);
+                    _logger.LogWarning(answer);
                 }
                 
             }
