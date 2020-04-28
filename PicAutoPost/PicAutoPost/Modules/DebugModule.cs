@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Discord.Commands;
 using Microsoft.Extensions.Logging;
 using Slavestefan.Aphrodite.Model;
+using Slavestefan.Aphrodite.Model.Users;
 using Slavestefan.Aphrodite.Web.Helpers;
 using Slavestefan.Aphrodite.Web.Logger;
 using Slavestefan.Aphrodite.Web.Services;
@@ -50,6 +51,26 @@ namespace Slavestefan.Aphrodite.Web.Modules
         {
             var assembly = Assembly.GetExecutingAssembly();
             await ReplyAsync($"Running version {assembly.GetName().Version} build date {new FileInfo(assembly.Location).CreationTimeUtc:yyyy-MM-dd} running in CLR Version {assembly.ImageRuntimeVersion} ");
+        }
+
+        [Command("Block")]
+        public async Task BlockUser(ulong userSnowflake, bool block = true)
+        {
+            var user = TypedDbContext.Users.FirstOrDefault(x => x.DiscordId == userSnowflake);
+
+            if (user == null)
+            {
+                user = new User()
+                {
+                    DiscordId = userSnowflake
+                };
+
+                TypedDbContext.Users.Add(user);
+            }
+
+            user.Status = UserStatus.Blocked;
+            TypedDbContext.SaveChanges();
+            await ReplyAsync($"Successfully blocked user {userSnowflake}");
         }
     }
 }

@@ -138,35 +138,47 @@ namespace Slavestefan.Aphrodite.Web.Services
             await message.Channel.SendMessageAsync($"```{Phrases.SatinReactions[index]}```");
         }
 
+        //TODO: Clean this mess up
         private async Task Client_MessageReceived(SocketMessage message)
         {
+            // Check if user is blocked.
+            using var scope = _serviceProvider.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<PicAutoPostContext>();
+            if (dbContext.Users.Any(x => x.DiscordId == message.Author.Id && x.Status == Model.Users.UserStatus.Blocked))
+            {
+                return;
+            }
+
+            // Mess with Satin
             if (message.Author.Id == Users.PrincessSatin && _antiSatinMode && message.Content.ToLower().Contains("aphrodite"))
             {
                 await MessWithSatin(message);   
                 return;
             }
 
-            if(_drivebyHandler.WantsToHandle(message))
+            // Driveby Handler TODO: User generic message handlers.
+            if (_drivebyHandler.WantsToHandle(message))
             {
                 await _drivebyHandler.Handle(message);
                 return;
             }
 
+            // TODO: Put this in 
             if (!(message is SocketUserMessage msg) || !msg.Content.StartsWith("!ap"))
             {
                 return;
             }
 
+            // TODO: Make a proper command for static options.
             if (msg.Content.ToLower() == "!ap antisatinmode")
             {
                 _antiSatinMode = !_antiSatinMode;
                 await msg.Channel.SendMessageAsync($"Satin mode {(_antiSatinMode ? "engaged" : "disengaged")}");
-                var scope = _serviceProvider.CreateScope();
                 await scope.ServiceProvider.GetRequiredService<BotConfigService>().SetBoolValue(BotConfigKeys.MessWithSatinKey, _antiSatinMode);
-                scope.Dispose();
                 return;
             }
 
+            // Finally some code that actually belongs in this method.
             var context = new SocketCommandContext(_client, msg);
 
             var result = await _commands.ExecuteAsync(

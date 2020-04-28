@@ -11,5 +11,13 @@ namespace Slavestefan.Aphrodite.Model.Users
         public Guid IdUser { get; set; }
         public string Username { get; set; }
         public ulong DiscordId { get; set; }
+        public UserStatus Status { get; set; }
+    }
+
+    public enum UserStatus
+    {
+        None,
+        Admin,
+        Blocked
     }
 }
