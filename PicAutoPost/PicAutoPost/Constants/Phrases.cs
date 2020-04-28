@@ -25,7 +25,9 @@ namespace Slavestefan.Aphrodite.Web.Constants
             "I saw it",
             "Poor lockees",
             ":fire: :fire: :fire: :fire: :fire: ",
-            //TODO: Think of more
+            "Everyone but me",
+            "Especially Satin",
+            ""
         };
     }
 }

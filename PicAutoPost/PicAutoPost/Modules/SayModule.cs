@@ -32,9 +32,38 @@ namespace Slavestefan.Aphrodite.Web.Modules
         {
             try
             {
-                var channelId = _options.CurrentValue.SayChannelId;
-                var mentiontokens = message.Split(' ').Where(x => !string.IsNullOrEmpty(x) && x[0] == '@').Where(x => !string.Equals(x, "@everyone", StringComparison.OrdinalIgnoreCase));
-                var mentionReplacePairs = mentiontokens.Select(x => new {Replacable = x, UserSnowflake = _bot.GuesstimateUser(x.Trim('@'), channelId)}).ToList();
+                var tokens = message.Split(' ');
+                ulong? replyChannel = null;
+                if (tokens[0].StartsWith("$"))
+                {
+                    switch (tokens[0])
+                    {
+                        case "$sarah":
+                            replyChannel = 702184718103478309;
+                            break;
+                        case "$stefan":
+                            replyChannel = 646857015787782180;
+                            break;
+                        case "$test":
+                            replyChannel = 655835216174120961;
+                            break;
+                        default:
+                            if (ulong.TryParse(tokens[0].Trim('$'), out var result))
+                            {
+                                replyChannel = result;
+                            }
+                            break;
+                    }
+
+                    tokens = tokens.Skip(1).ToArray();
+                }
+
+                if (replyChannel == null)
+                {
+                    replyChannel = _options.CurrentValue.SayChannelId;
+                }
+                var mentiontokens = tokens.Where(x => !string.IsNullOrEmpty(x) && x[0] == '@').Where(x => !string.Equals(x, "@everyone", StringComparison.OrdinalIgnoreCase));
+                var mentionReplacePairs = mentiontokens.Select(x => new {Replacable = x, UserSnowflake = _bot.GuesstimateUser(x.Trim('@'), replyChannel.Value)}).ToList();
                 bool notFound = false;
                 foreach (var alias in mentionReplacePairs)
                 {
@@ -49,14 +78,14 @@ namespace Slavestefan.Aphrodite.Web.Modules
 
                 if (!notFound)
                 {
-                    await _bot.SendRawMessage(message, channelId);
+                    await _bot.SendRawMessage(string.Join(' ', tokens), replyChannel.Value);
                     await ReplyAsync("Message sent");
                 }
                 else
                 {
                     var answer = $"Could not find user with name(s) {string.Join(',', mentionReplacePairs.Where(x => x.UserSnowflake == null).Select(x => x.Replacable))}";
                     await ReplyAsync(answer);
-                    _logger.LogWarning(answer);
+                    _logger.LogWarning(answer); 
                 }
                 
             }
