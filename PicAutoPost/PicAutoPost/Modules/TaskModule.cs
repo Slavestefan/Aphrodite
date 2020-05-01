@@ -1,7 +1,6 @@
 ﻿
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Discord;
@@ -58,31 +57,38 @@ namespace Slavestefan.Aphrodite.Web.Modules
         [Command("Add")]
         public async Task AddTask(string setNameOrId, string description)
         {
-            var taskSet = GetTaskSetFromNameOrId(setNameOrId);
-            if (taskSet == null)
+            try
             {
-                await ReplySimpleEmbedAsync($"Taskset {setNameOrId} not found, task was not added.");
-                return;
+                var taskSet = GetTaskSetFromNameOrId(setNameOrId);
+                if (taskSet == null)
+                {
+                    await ReplySimpleEmbedAsync($"Taskset {setNameOrId} not found, task was not added.");
+                    return;
+                }
+
+                if (taskSet.Owner.DiscordId != Context.User.Id)
+                {
+                    await ReplySimpleEmbedAsync($"You are not the owner of this taskset");
+                }
+
+                var task = new ApTask
+                {
+                    Description = description,
+                };
+
+                if (Context.Message.Attachments.Any())
+                {
+                    task.Image = new Uri(Context.Message.Attachments.First().Url);
+                }
+
+                taskSet.Tasks.Add(task);
+                TypedDbContext.SaveChanges();
+                await ReplySimpleEmbedAsync($"Task {description} was added to taskset {setNameOrId}");
             }
-
-            if (taskSet.Owner.DiscordId != Context.User.Id)
+            catch (Exception ex)
             {
-                await ReplySimpleEmbedAsync($"You are not the owner of this taskset");
+                _logger.LogError($"Could not add task {ex}");
             }
-
-            var task = new ApTask
-            {
-                Description = description,
-            };
-
-            if (Context.Message.Attachments.Any())
-            {
-                task.Image = new Uri(Context.Message.Attachments.First().Url);
-            }
-
-            taskSet.Tasks.Add(task);
-            TypedDbContext.SaveChanges();
-            await ReplySimpleEmbedAsync($"Task {description} was added to taskset {setNameOrId}");
         }
 
         [Command("Roll")]
@@ -144,6 +150,74 @@ namespace Slavestefan.Aphrodite.Web.Modules
             }
         }
 
+        [Command("List")]
+        public async Task List(string setNameOrId = null)
+        {
+            if (setNameOrId == null)
+            {
+                await ReplyAsync(embed: ListTaskSets());
+            }
+
+            var taskSet = GetTaskSetFromNameOrId(setNameOrId);
+
+            if (taskSet == null)
+            {
+                await ReplySimpleEmbedAsync($"Could not find set {setNameOrId}");
+                return;
+            }
+
+            await ReplyAsync(embed: ListTasksFromSet(taskSet));
+        }
+
+        private Embed ListTaskSets()
+        {
+            var sets = TypedDbContext.TaskSets.AsQueryable().Where(x => x.Owner.DiscordId == Context.User.Id);
+
+            var embed = new EmbedBuilder
+            {
+                Description = "Your task sets " + Context.User.Mention,
+                Fields = new List<EmbedFieldBuilder>()
+            };
+
+            foreach (var item in sets)
+            {
+                var embedField = new EmbedFieldBuilder
+                {
+                    Name = item.IdTaskSet.ToString(),
+                    Value = item.Name
+                };
+                embed.Fields.Add(embedField);
+            }
+
+            return embed.Build();
+        }
+
+        private Embed ListTasksFromSet(TaskSet taskSet)
+        {
+            var embed = new EmbedBuilder
+            {
+                Description = $"Tasks in set {taskSet.Name}",
+                Footer = new EmbedFooterBuilder
+                {
+                    Text = $"Request by {Context.User.Username}#{Context.User.Discriminator}"
+                },
+                Fields = new List<EmbedFieldBuilder>()
+            };
+
+            foreach (var item in taskSet.Tasks)
+            {
+                var embedField = new EmbedFieldBuilder
+                {
+                    IsInline = false,
+                    Name = item.IdTask.ToString(),
+                    Value = item.Description
+                };
+                embed.Fields.Add(embedField);
+            }
+
+            return embed.Build();
+        }
+
         private TaskSet GetTaskSetFromNameOrId(string nameOrId)
         {
             if(Guid.TryParse(nameOrId, out var guid))
@@ -152,7 +226,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
             }
             else
             {
-                return TypedDbContext.TaskSets.Include(x => x.Tasks).FirstOrDefault(x => x.Name == nameOrId);
+                return TypedDbContext.TaskSets.Include(x => x.Tasks).Include(x => x.Owner).FirstOrDefault(x => x.Name == nameOrId);
             }
         }
     }

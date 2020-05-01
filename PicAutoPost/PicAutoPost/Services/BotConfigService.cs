@@ -1,6 +1,4 @@
-﻿
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -130,6 +128,6 @@ namespace Slavestefan.Aphrodite.Web.Services
 
 
         private async Task<BotConfiguration> GetConfig(string key, ulong channelId = 0)
-            => await _context.BotConfigurations.FirstOrDefaultAsync(x => x.Key == key && x.ChannelId == channelId);
+            => await _context.BotConfigurations.AsQueryable().FirstOrDefaultAsync(x => x.Key == key && x.ChannelId == channelId);
     }
 }
