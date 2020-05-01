@@ -47,6 +47,10 @@ namespace Slavestefan.Aphrodite.Web.Modules
                         case "$test":
                             replyChannel = 655835216174120961;
                             break;
+                        case "$edk":
+                        case "$ekd":
+                            replyChannel = 474851988102840321;
+                            break;
                         default:
                             if (ulong.TryParse(tokens[0].Trim('$'), out var result))
                             {

@@ -40,12 +40,13 @@ namespace Slavestefan.Aphrodite.Web.Modules
                     new EmbedFieldBuilder
                     {
                         IsInline = true,
+                        Name = "Reply",
                         Value = message
                     }
                 },
                 Footer = new EmbedFooterBuilder
                 {
-                    Text = $"Request by " + Context.User.Mention
+                    Text = $"Request by {Context.User.Username}#{Context.User.Discriminator}"
                 }
             };
 

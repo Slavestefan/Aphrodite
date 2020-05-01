@@ -107,7 +107,7 @@ namespace Slavestefan.Aphrodite.Web.Services
             using var client = new HttpClient();
             try
             {
-                await client.GetAsync("https://picautopost20191212060808.azurewebsites.net/", _stopExecutionToken);
+                await client.GetAsync(Constants.Urls.BaseAppUrl, _stopExecutionToken);
             }
             catch
             {

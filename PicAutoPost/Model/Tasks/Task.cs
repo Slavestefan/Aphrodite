@@ -2,7 +2,6 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using Slavestefan.Aphrodite.Model.Users;
 
 namespace Slavestefan.Aphrodite.Model.Tasks
 {
@@ -10,12 +9,7 @@ namespace Slavestefan.Aphrodite.Model.Tasks
     {
         [Key]
         public Guid IdTask { get; set; }
-        [Required]
-        public User Owner { get; set; }
-        [Required]
-        public string Name { get; set; }
-        [Required]
+        public Uri Image { get; set; }
         public string Description { get; set; }
-        public string HiddenDescription { get; set; }
     }
 }

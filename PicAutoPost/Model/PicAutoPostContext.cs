@@ -23,9 +23,9 @@ namespace Slavestefan.Aphrodite.Model
         public DbSet<Picture> Pictures { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<BotConfiguration> BotConfigurations { get; set; }
-        //public DbSet<Task> Tasks { get; set; }
-        //public DbSet<TaskConfiguration> TaskConfigurations { get; set; }
-        //public DbSet<TaskHistory> TaskHistories { get; set; }
+        public DbSet<Task> Tasks { get; set; }
+        public DbSet<TaskSet> TaskSets { get; set; }
+        public DbSet<TaskHistory> TaskHistories { get; set; }
 
         public DbSet<UserAlias> UserAliases { get; set; }
         //public DbSet<UserConfiguration> UserConfigurations { get; set; }
