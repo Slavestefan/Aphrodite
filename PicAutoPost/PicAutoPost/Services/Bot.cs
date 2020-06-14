@@ -40,7 +40,7 @@ namespace Slavestefan.Aphrodite.Web.Services
             _commands = _serviceProvider.GetService<CommandService>();
         }
 
-        private DiscordSocketClient Client
+        public DiscordSocketClient Client
         {
             get
             {

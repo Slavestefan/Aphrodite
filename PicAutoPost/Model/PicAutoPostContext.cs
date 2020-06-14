@@ -26,7 +26,7 @@ namespace Slavestefan.Aphrodite.Model
         public DbSet<Task> Tasks { get; set; }
         public DbSet<TaskSet> TaskSets { get; set; }
         public DbSet<TaskHistory> TaskHistories { get; set; }
-
+        public DbSet<MultiSet> MultiSet { get; set; }
         public DbSet<UserAlias> UserAliases { get; set; }
         //public DbSet<UserConfiguration> UserConfigurations { get; set; }
 
@@ -34,6 +34,17 @@ namespace Slavestefan.Aphrodite.Model
         {
             modelBuilder.Entity<BotConfiguration>().HasIndex(b => new {b.ChannelId, b.Key}).IsUnique();
             modelBuilder.Entity<Picture>().HasIndex("Hash", "UserIdUser").IsUnique();
+
+            modelBuilder.Entity<MultiSetTaskSet>()
+                .HasOne(msts => msts.MultiSet)
+                .WithMany(ms => ms.MultiSetTaskSets)
+                .HasForeignKey(mst => mst.IdMultiSet);
+
+            modelBuilder.Entity<MultiSetTaskSet>()
+                .HasOne(msts => msts.TaskSet)
+                .WithMany(ts => ts.MultiSetTaskSets)
+                .HasForeignKey(msts => msts.IdTaskSet);
+
         }
 
         public async Task<User> GetOrCreateUserAsync(ulong snowflake, string name)

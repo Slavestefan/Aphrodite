@@ -2,15 +2,14 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using Slavestefan.Aphrodite.Model.Users;
 
 namespace Slavestefan.Aphrodite.Model.Tasks
 {
-    public class Task
+    public class TaskVariation
     {
         [Key]
-        public Guid IdTask { get; set; }
-        public Uri Image { get; set; }
+        public Guid IdTaskVariation { get; set; }
+        public Task Task { get; set; }
         public string Description { get; set; }
     }
 }

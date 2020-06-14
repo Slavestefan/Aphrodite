@@ -20,5 +20,6 @@ namespace Slavestefan.Aphrodite.Model.Tasks
         public IList<Task> Tasks { get; set; }
         public bool DoAllowMultiroll { get; set; }
         public bool DoesMultirollRepeat { get; set; }
+        public IList<MultiSetTaskSet> MultiSetTaskSets { get; set; }
     }
 }

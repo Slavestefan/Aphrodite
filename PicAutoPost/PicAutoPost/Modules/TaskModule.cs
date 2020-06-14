@@ -16,7 +16,7 @@ using Task = System.Threading.Tasks.Task;
 namespace Slavestefan.Aphrodite.Web.Modules
 {
     [Group("Task")]
-    public class TaskModule : AphroditeModuleBase
+    public partial class TaskModule : AphroditeModuleBase
     {
         private readonly ILogger<TaskModule> _logger;
 
@@ -94,42 +94,68 @@ namespace Slavestefan.Aphrodite.Web.Modules
         [Command("Roll")]
         public async Task Roll(string setNameOrId, int amount = 1)
         {
-            if (amount == 0)
+            try
             {
-                await ReplySimpleEmbedAsync("Haha, good one.");
-                return;
-            }
-
-            var taskSet = GetTaskSetFromNameOrId(setNameOrId);
-            IList<ApTask> result;
-
-            if (taskSet.DoesMultirollRepeat)
-            {
-                result = new List<ApTask>();
-
-                for (int i = 0; i < amount; ++i)
+                if (amount == 0)
                 {
-                    result.Add(taskSet.Tasks.GetRandomNonRepeating(1).First());
-                }
-            }
-            else
-            {
-                if (amount > taskSet.Tasks.Count)
-                {
-                    await ReplySimpleEmbedAsync("Taskset does not have that many tasks");
+                    await ReplySimpleEmbedAsync("Haha, good one.");
                     return;
                 }
 
-                result = taskSet.Tasks.GetRandomNonRepeating(amount);
-            }
-            
-
-            foreach (var task in result)
-            {
-                var embed = new EmbedBuilder
+                var multiSet = GetMultiSetFromNameOrId(setNameOrId);
+                var taskSet = GetTaskSetFromNameOrId(setNameOrId);
+                
+                if (multiSet != null && taskSet != null)
                 {
-                    ImageUrl = task.Image?.ToString(),
-                    Fields = new List<EmbedFieldBuilder>
+                    await ReplySimpleEmbedAsync($"Ambiguous name, please use one of the following Ids to roll: {taskSet.IdTaskSet} (single Task Roll) or {multiSet.IdMultiSet} (Multi Task Roll");
+                    return;
+                }
+
+                if (multiSet != null)
+                {
+                    foreach (var taskRoll in multiSet.MultiSetTaskSets.Select(x => x.TaskSet))
+                    {
+                        await Roll(taskRoll.IdTaskSet.ToString());
+                    }
+                    return;
+                }
+
+                IList<ApTask> result;
+
+                if (taskSet.DoesMultirollRepeat)
+                {
+                    result = new List<ApTask>();
+
+                    for (int i = 0; i < amount; ++i)
+                    {
+                        result.Add(taskSet.Tasks.GetRandomNonRepeating(1).First());
+                    }
+                }
+                else
+                {
+                    if (amount > taskSet.Tasks.Count)
+                    {
+                        await ReplySimpleEmbedAsync("Taskset does not have that many tasks");
+                        return;
+                    }
+
+                    result = taskSet.Tasks.GetRandomNonRepeating(amount);
+                }
+
+                var user = await TypedDbContext.GetOrCreateUserAsync(Context.User.Id, Context.User.Username);
+                foreach (var task in result)
+                {
+                    var taskHistory = new TaskHistory
+                    {
+                        Task = task,
+                        Picker = user,
+                        Time = DateTime.Now
+                    };
+                    TypedDbContext.TaskHistories.Add(taskHistory);
+                    var embed = new EmbedBuilder
+                    {
+                        ImageUrl = task.Image?.ToString(),
+                        Fields = new List<EmbedFieldBuilder>
                     {
                         new EmbedFieldBuilder
                         {
@@ -144,9 +170,15 @@ namespace Slavestefan.Aphrodite.Web.Modules
                             IsInline = true
                         },
                     }
-                };
+                    };
 
-                await ReplyAsync(embed: embed.Build());
+                    TypedDbContext.SaveChanges();
+                    await ReplyAsync(embed: embed.Build());
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error during task roll {setNameOrId}: {ex}");
             }
         }
 
@@ -156,6 +188,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
             if (setNameOrId == null)
             {
                 await ReplyAsync(embed: ListTaskSets());
+                return;
             }
 
             var taskSet = GetTaskSetFromNameOrId(setNameOrId);
@@ -167,6 +200,70 @@ namespace Slavestefan.Aphrodite.Web.Modules
             }
 
             await ReplyAsync(embed: ListTasksFromSet(taskSet));
+        }
+
+        [Command("CreateMulti")]
+        public async Task CreateMulti(string multiSetName)
+        {
+            try
+            {
+                if (TypedDbContext.MultiSet.Any(x => x.Name == multiSetName) || TypedDbContext.TaskSets.Any(x => x.Name == multiSetName))
+                {
+                    await ReplySimpleEmbedAsync($"Name is already taken, please choose another.");
+                    return;
+                }
+
+                var multiSet = new MultiSet()
+                {
+                    Name = multiSetName,
+                    Owner = await TypedDbContext.GetOrCreateUserAsync(Context.Message.Author.Id, Context.Message.Author.Username),
+                };
+
+                TypedDbContext.MultiSet.Add(multiSet);
+                TypedDbContext.SaveChanges();
+                await ReplySimpleEmbedAsync($"MultiSet {multiSetName} has been created with Id: {multiSet.IdMultiSet}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Could not create MultiSet {ex}");
+            }
+        }
+
+        [Command("AddMulti")]
+        public async Task AddToMultiTaskSet(string multiSetName, string taskSetName)
+        {
+            try
+            {
+                var multi = GetMultiSetFromNameOrId(multiSetName);
+                if (multi == null)
+                {
+                    await ReplySimpleEmbedAsync($"Could not find MultiSet with name {multiSetName}");
+                    return;
+                }
+
+                var taskSet = GetTaskSetFromNameOrId(taskSetName);
+                if (taskSet == null)
+                {
+                    await ReplySimpleEmbedAsync($"Could not find TaskSet with name {taskSetName}");
+                    return;
+                }
+
+                multi.MultiSetTaskSets.Add(new MultiSetTaskSet
+                {
+                    IdMultiSet = multi.IdMultiSet,
+                    IdTaskSet = taskSet.IdTaskSet,
+                    MultiSet = multi,
+                    TaskSet = taskSet
+                });
+
+                TypedDbContext.SaveChanges();
+                await ReplySimpleEmbedAsync($"Added Taskset with Id {taskSet.IdTaskSet} to MultiSet with Id {multi.IdMultiSet}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Could not add to Multiset {ex}");
+                await ReplySimpleEmbedAsync("An error has occured");
+            }
         }
 
         private Embed ListTaskSets()
@@ -227,6 +324,18 @@ namespace Slavestefan.Aphrodite.Web.Modules
             else
             {
                 return TypedDbContext.TaskSets.Include(x => x.Tasks).Include(x => x.Owner).FirstOrDefault(x => x.Name == nameOrId);
+            }
+        }
+
+        private MultiSet GetMultiSetFromNameOrId(string nameOrId)
+        {
+            if (Guid.TryParse(nameOrId, out var guid))
+            {
+                return TypedDbContext.MultiSet.Include(x => x.MultiSetTaskSets).ThenInclude(x => x.TaskSet).Include(x => x.Owner).FirstOrDefault(x => x.IdMultiSet == guid);
+            }
+            else
+            {
+                return TypedDbContext.MultiSet.Include(x => x.MultiSetTaskSets).ThenInclude(x => x.TaskSet).Include(x => x.Owner).FirstOrDefault(x => x.Name == nameOrId);
             }
         }
     }

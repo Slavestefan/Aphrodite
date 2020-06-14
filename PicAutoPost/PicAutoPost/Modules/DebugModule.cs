@@ -2,8 +2,11 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using Discord.Commands;
+using Discord.WebSocket;
+using Discord;
 using Microsoft.Extensions.Logging;
 using Slavestefan.Aphrodite.Model;
 using Slavestefan.Aphrodite.Model.Users;
@@ -68,9 +71,43 @@ namespace Slavestefan.Aphrodite.Web.Modules
                 TypedDbContext.Users.Add(user);
             }
 
-            user.Status = UserStatus.Blocked;
+            user.Status = Slavestefan.Aphrodite.Model.Users.UserStatus.Blocked;
             TypedDbContext.SaveChanges();
             await ReplyAsync($"Successfully blocked user {userSnowflake}");
+        }
+
+        [Command("Dump")]
+        [RequireUserPrecondition(new[] { Constants.Users.Slavestefan })]
+        public async Task Dump(ulong channelSnowflake, int messageCount)
+        {
+
+            ISocketMessageChannel channel = null;
+            try
+            {
+                channel = (ISocketMessageChannel)_bot.Client.GetChannel(channelSnowflake);
+                if (channel == null)
+                {
+                    await Context.Message.Author.SendMessageAsync("Channel not found");
+                    return;
+                }
+
+                var msgs = await channel.GetMessagesAsync(messageCount).FlattenAsync();
+                var sb = new StringBuilder();
+                foreach (var msg in msgs)
+                {
+                    sb.Append(msg.CreatedAt.ToString("yyyyMMddHHmmss"));
+                    sb.Append(" ");
+                    sb.Append(msg.Author.Username);
+                    sb.Append(": ");
+                    sb.AppendLine(msg.Content);
+                }
+
+                File.WriteAllText(channelSnowflake + DateTime.Now.ToString("yyyyMMddHHmmss") + ".txt", sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                await Context.Message.Author.SendMessageAsync(("Exception while searching for channel" + ex).Substring(0, 200));
+            }
         }
     }
 }
