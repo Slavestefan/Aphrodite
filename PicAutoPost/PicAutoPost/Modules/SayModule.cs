@@ -30,6 +30,8 @@ namespace Slavestefan.Aphrodite.Web.Modules
         [Command("Say")]
         public async Task Say([Remainder] string message)
         {
+            string rawMessage = message;
+
             try
             {
                 var tokens = message.Split(' ');
@@ -60,8 +62,9 @@ namespace Slavestefan.Aphrodite.Web.Modules
                     }
 
                     tokens = tokens.Skip(1).ToArray();
+                    message = string.Join(' ', tokens);
                 }
-
+                
                 var pics = Context.Message.GetPictures();
 
                 if (replyChannel == null)
@@ -90,7 +93,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
                     }
                     else
                     {
-                        await _bot.SendRawMessage(string.Join(' ', tokens), replyChannel.Value);
+                        await _bot.SendRawMessage(message, replyChannel.Value);
                     }
                     
                     await ReplyAsync("Message sent");
@@ -105,7 +108,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Could not say phrase {message}: {ex.ToString()}");
+                _logger.LogError($"Could not say phrase {rawMessage}: {ex.ToString()}");
             }
         }
     }
