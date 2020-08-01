@@ -266,6 +266,21 @@ namespace Slavestefan.Aphrodite.Web.Services
             await channel.SendMessageAsync(string.Empty, embed: embed.Build());
         }
 
+        internal async Task SendMultipleEmbeds(string message, ulong channelId, List<Embed> embeds)
+        {
+            for (var i = 0; i < embeds.Count; ++i)
+            {
+                if (i != 0)
+                {
+                    await this.SendRawMessage(null, channelId, embeds[i]);
+                }
+                else
+                {
+                    await this.SendRawMessage(message, channelId, embeds[i]);
+                }
+            }
+        }
+
         internal async Task SendRawMessage(string message, ulong channelId, Embed embed = null)
         {
             if (!(_client.GetChannel(channelId) is ISocketMessageChannel channel))
@@ -274,6 +289,31 @@ namespace Slavestefan.Aphrodite.Web.Services
             }
 
             await channel.SendMessageAsync(message, embed: embed);
+        }
+
+        internal async Task SendRawFile(ulong channelId, string filePath, string message = null, Embed embed = null)
+        {
+            if (!(_client.GetChannel(channelId) is ISocketMessageChannel channel))
+            {
+                throw new ArgumentException($"Channel {channelId} not found");
+            }
+
+            await channel.SendFileAsync(filePath, message, embed:embed);
+        }
+
+        internal async Task SendMultipleFiles(ulong channelId, IList<string> files, string message = null)
+        {
+            for (var i = 0; i < files.Count; ++i)
+            {
+                if (i != 0)
+                {
+                    await this.SendRawFile(channelId, files[i]);
+                }
+                else
+                {
+                    await this.SendRawFile(channelId, files[i], message);
+                }
+            }
         }
 
         public string GetChannelNameFromSnowflake(ulong channelId)

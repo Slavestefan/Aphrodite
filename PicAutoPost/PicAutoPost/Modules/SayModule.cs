@@ -62,6 +62,8 @@ namespace Slavestefan.Aphrodite.Web.Modules
                     tokens = tokens.Skip(1).ToArray();
                 }
 
+                var pics = Context.Message.GetPictures();
+
                 if (replyChannel == null)
                 {
                     replyChannel = _options.CurrentValue.SayChannelId;
@@ -82,7 +84,15 @@ namespace Slavestefan.Aphrodite.Web.Modules
 
                 if (!notFound)
                 {
-                    await _bot.SendRawMessage(string.Join(' ', tokens), replyChannel.Value);
+                    if (pics.Any())
+                    {
+                        await _bot.SendMultipleEmbeds(message, replyChannel.Value, pics.Select(Converter.ToEmbed).ToList());
+                    }
+                    else
+                    {
+                        await _bot.SendRawMessage(string.Join(' ', tokens), replyChannel.Value);
+                    }
+                    
                     await ReplyAsync("Message sent");
                 }
                 else

@@ -14,5 +14,15 @@ namespace Slavestefan.Aphrodite.Web.Helpers
 
             return builder.Build();
         }
+
+        public static Embed ToEmbed (string url)
+        {
+            var builder = new EmbedBuilder
+            {
+                ImageUrl = url
+            };
+
+            return builder.Build();
+        }
     }
 }
