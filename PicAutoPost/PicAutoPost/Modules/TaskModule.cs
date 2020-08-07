@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using Slavestefan.Aphrodite.Common;
 using Slavestefan.Aphrodite.Model;
 using Slavestefan.Aphrodite.Model.Tasks;
+using Slavestefan.Aphrodite.Web.Services;
 using ApTask = Slavestefan.Aphrodite.Model.Tasks.Task;
 using Task = System.Threading.Tasks.Task;
 
@@ -19,10 +20,12 @@ namespace Slavestefan.Aphrodite.Web.Modules
     public partial class TaskModule : AphroditeModuleBase
     {
         private readonly ILogger<TaskModule> _logger;
+        private readonly TaskService _taskService;
 
         public TaskModule(IServiceProvider services, ILogger<TaskModule> logger) : base(services)
         {
             _logger = logger;
+            _taskService = new TaskService(TypedDbContext);
         }
 
         [Command("Create")]
@@ -55,11 +58,11 @@ namespace Slavestefan.Aphrodite.Web.Modules
         }
 
         [Command("Add")]
-        public async Task AddTask(string setNameOrId, string description)
+        public async Task AddTask(string setNameOrId, [Remainder] string description)
         {
             try
             {
-                var taskSet = GetTaskSetFromNameOrId(setNameOrId);
+                var taskSet = _taskService.GetTaskSetFromNameOrId(setNameOrId);
                 if (taskSet == null)
                 {
                     await ReplySimpleEmbedAsync($"Taskset {setNameOrId} not found, task was not added.");
@@ -83,7 +86,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
 
                 taskSet.Tasks.Add(task);
                 TypedDbContext.SaveChanges();
-                await ReplySimpleEmbedAsync($"Task {description} was added to taskset {setNameOrId}");
+                await ReplySimpleEmbedAsync($"Task \"{description}\" was added to taskset {setNameOrId}");
             }
             catch (Exception ex)
             {
@@ -102,8 +105,8 @@ namespace Slavestefan.Aphrodite.Web.Modules
                     return;
                 }
 
-                var multiSet = GetMultiSetFromNameOrId(setNameOrId);
-                var taskSet = GetTaskSetFromNameOrId(setNameOrId);
+                var multiSet = _taskService.GetMultiSetFromNameOrId(setNameOrId);
+                var taskSet = _taskService.GetTaskSetFromNameOrId(setNameOrId);
                 
                 if (multiSet != null && taskSet != null)
                 {
@@ -173,7 +176,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
                     };
 
                     TypedDbContext.SaveChanges();
-                    await ReplyAsync(embed: embed.Build());
+                    await ReplySimpleEmbedAsync(embed);
                 }
             }
             catch (Exception ex)
@@ -187,11 +190,11 @@ namespace Slavestefan.Aphrodite.Web.Modules
         {
             if (setNameOrId == null)
             {
-                await ReplyAsync(embed: ListTaskSets());
+                await ReplySimpleEmbedAsync(ListTaskSets());
                 return;
             }
 
-            var taskSet = GetTaskSetFromNameOrId(setNameOrId);
+            var taskSet = _taskService.GetTaskSetFromNameOrId(setNameOrId);
 
             if (taskSet == null)
             {
@@ -199,7 +202,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
                 return;
             }
 
-            await ReplyAsync(embed: ListTasksFromSet(taskSet));
+            await ReplySimpleEmbedAsync(ListTasksFromSet(taskSet));
         }
 
         [Command("CreateMulti")]
@@ -234,14 +237,14 @@ namespace Slavestefan.Aphrodite.Web.Modules
         {
             try
             {
-                var multi = GetMultiSetFromNameOrId(multiSetName);
+                var multi = _taskService.GetMultiSetFromNameOrId(multiSetName);
                 if (multi == null)
                 {
                     await ReplySimpleEmbedAsync($"Could not find MultiSet with name {multiSetName}");
                     return;
                 }
 
-                var taskSet = GetTaskSetFromNameOrId(taskSetName);
+                var taskSet = _taskService.GetTaskSetFromNameOrId(taskSetName);
                 if (taskSet == null)
                 {
                     await ReplySimpleEmbedAsync($"Could not find TaskSet with name {taskSetName}");
@@ -266,7 +269,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
             }
         }
 
-        private Embed ListTaskSets()
+        private EmbedBuilder ListTaskSets()
         {
             var sets = TypedDbContext.TaskSets.AsQueryable().Where(x => x.Owner.DiscordId == Context.User.Id);
 
@@ -286,10 +289,10 @@ namespace Slavestefan.Aphrodite.Web.Modules
                 embed.Fields.Add(embedField);
             }
 
-            return embed.Build();
+            return embed;
         }
 
-        private Embed ListTasksFromSet(TaskSet taskSet)
+        private EmbedBuilder ListTasksFromSet(TaskSet taskSet)
         {
             var embed = new EmbedBuilder
             {
@@ -312,31 +315,9 @@ namespace Slavestefan.Aphrodite.Web.Modules
                 embed.Fields.Add(embedField);
             }
 
-            return embed.Build();
+            return embed;
         }
 
-        private TaskSet GetTaskSetFromNameOrId(string nameOrId)
-        {
-            if(Guid.TryParse(nameOrId, out var guid))
-            {
-                return TypedDbContext.TaskSets.Include(x => x.Tasks).Include(x => x.Owner).FirstOrDefault(x => x.IdTaskSet == guid);
-            }
-            else
-            {
-                return TypedDbContext.TaskSets.Include(x => x.Tasks).Include(x => x.Owner).FirstOrDefault(x => x.Name == nameOrId);
-            }
-        }
 
-        private MultiSet GetMultiSetFromNameOrId(string nameOrId)
-        {
-            if (Guid.TryParse(nameOrId, out var guid))
-            {
-                return TypedDbContext.MultiSet.Include(x => x.MultiSetTaskSets).ThenInclude(x => x.TaskSet).Include(x => x.Owner).FirstOrDefault(x => x.IdMultiSet == guid);
-            }
-            else
-            {
-                return TypedDbContext.MultiSet.Include(x => x.MultiSetTaskSets).ThenInclude(x => x.TaskSet).Include(x => x.Owner).FirstOrDefault(x => x.Name == nameOrId);
-            }
-        }
     }
 }

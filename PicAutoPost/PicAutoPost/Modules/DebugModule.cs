@@ -109,5 +109,12 @@ namespace Slavestefan.Aphrodite.Web.Modules
                 await Context.Message.Author.SendMessageAsync(("Exception while searching for channel" + ex).Substring(0, 200));
             }
         }
+
+        [Command("Echo")]
+        public async Task Echo([Remainder] string content)
+        {
+            await base.ReplySimpleEmbedAsync(content);
+            
+        }
     }
 }

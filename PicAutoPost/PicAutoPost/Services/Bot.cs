@@ -218,7 +218,7 @@ namespace Slavestefan.Aphrodite.Web.Services
         [Obsolete("Use SendMessageAsEmbed instead")]
         internal async Task SendMessage(string message, ulong channelId, Embed embed = null)
         {
-            if (!(_client.GetChannel(channelId) is ISocketMessageChannel channel))
+            if (!(_client.GetChannel(channelId) is IMessageChannel channel))
             {
                 throw new ArgumentException($"Channel {channelId} not found");
             }
@@ -245,22 +245,19 @@ namespace Slavestefan.Aphrodite.Web.Services
 
         internal async Task SendMessageAsEmbed(string message, ulong channelId)
         {
-            if (!(_client.GetChannel(channelId) is ISocketMessageChannel channel))
+            if (!(_client.GetChannel(channelId) is IMessageChannel channel))
             {
                 throw new ArgumentException($"Channel {channelId} not found");
             }
 
+            await SendMessageAsEmbed(message, channel);
+        }
+
+        internal async Task SendMessageAsEmbed(string message, IMessageChannel channel)
+        {
             var embed = new EmbedBuilder
             {
                 Description = message,
-                Fields = new List<EmbedFieldBuilder>()
-                {
-                    new EmbedFieldBuilder
-                    {
-                        Name = string.Empty,
-                        Value = message
-                    }
-                }
             };
 
             await channel.SendMessageAsync(string.Empty, embed: embed.Build());
@@ -283,7 +280,7 @@ namespace Slavestefan.Aphrodite.Web.Services
 
         internal async Task SendRawMessage(string message, ulong channelId, Embed embed = null)
         {
-            if (!(_client.GetChannel(channelId) is ISocketMessageChannel channel))
+            if (!(_client.GetChannel(channelId) is IMessageChannel channel))
             {
                 throw new ArgumentException($"Channel {channelId} not found");
             }
@@ -293,7 +290,7 @@ namespace Slavestefan.Aphrodite.Web.Services
 
         internal async Task SendRawFile(ulong channelId, string filePath, string message = null, Embed embed = null)
         {
-            if (!(_client.GetChannel(channelId) is ISocketMessageChannel channel))
+            if (!(_client.GetChannel(channelId) is IMessageChannel channel))
             {
                 throw new ArgumentException($"Channel {channelId} not found");
             }
@@ -316,7 +313,7 @@ namespace Slavestefan.Aphrodite.Web.Services
             }
         }
 
-        public string GetChannelNameFromSnowflake(ulong channelId)
+        internal string GetChannelNameFromSnowflake(ulong channelId)
         {
             var channel = _client.GetChannel(channelId) as SocketGuildChannel;
             if (channel == null)
@@ -327,7 +324,7 @@ namespace Slavestefan.Aphrodite.Web.Services
             return channel.Name;
         }
 
-        public ulong? GuesstimateUser(string name, ulong channelId)
+        internal ulong? GuesstimateUser(string name, ulong channelId)
         {
             if (!(_client.GetChannel(channelId) is SocketGuildChannel channel))
             {
@@ -344,6 +341,15 @@ namespace Slavestefan.Aphrodite.Web.Services
             {
                 return null;
             }
+        }
+
+        internal SocketUser GetUserFromSnowflake(ulong snowflake)
+            => _client.GetUser(snowflake);
+
+        internal async Task DmUserAsync(ulong userSnowflake, string message)
+        {
+            var channel = await _client.GetUser(userSnowflake).GetOrCreateDMChannelAsync();
+            await SendMessageAsEmbed(message, channel);
         }
     }
 }

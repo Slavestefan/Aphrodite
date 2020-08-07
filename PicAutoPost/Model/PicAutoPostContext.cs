@@ -28,6 +28,7 @@ namespace Slavestefan.Aphrodite.Model
         public DbSet<TaskHistory> TaskHistories { get; set; }
         public DbSet<MultiSet> MultiSet { get; set; }
         public DbSet<UserAlias> UserAliases { get; set; }
+        public DbSet<OwnerSlaveRelationship> OwnerSlaveRelationships { get; set; }
         //public DbSet<UserConfiguration> UserConfigurations { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -45,6 +46,16 @@ namespace Slavestefan.Aphrodite.Model
                 .WithMany(ts => ts.MultiSetTaskSets)
                 .HasForeignKey(msts => msts.IdTaskSet);
 
+            modelBuilder.Entity<OwnerSlaveRelationship>()
+                .HasIndex("SlaveIdUser", "OwnerIdUser").IsUnique();
+
+            modelBuilder.Entity<OwnerSlaveRelationship>()
+                .Property("OwnerIdUser")
+                .IsRequired();
+
+            modelBuilder.Entity<OwnerSlaveRelationship>()
+                .Property("SlaveIdUser")
+                .IsRequired();
         }
 
         public async Task<User> GetOrCreateUserAsync(ulong snowflake, string name)
@@ -64,5 +75,9 @@ namespace Slavestefan.Aphrodite.Model
 
             return user;
         }
+
+        public async Task<User> GetOwnerAsync(User user)
+            => (await this.OwnerSlaveRelationships.Include(x => x.Slave).Include(x => x.Owner).FirstOrDefaultAsync(x => x.Slave.IdUser == user.IdUser)).Owner;
+
     }
 } 

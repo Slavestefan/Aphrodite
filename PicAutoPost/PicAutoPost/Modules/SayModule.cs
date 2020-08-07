@@ -57,7 +57,9 @@ namespace Slavestefan.Aphrodite.Web.Modules
                             if (ulong.TryParse(tokens[0].Trim('$'), out var result))
                             {
                                 replyChannel = result;
+                                break;
                             }
+
                             break;
                     }
 

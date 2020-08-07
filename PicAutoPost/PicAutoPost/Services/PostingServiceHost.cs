@@ -48,7 +48,7 @@ namespace Slavestefan.Aphrodite.Web.Services
             if (_postingServices.ContainsKey(config.ChannelId))
             {
                 tuple = _postingServices[config.ChannelId];
-                if (tuple.Service.IsRunning)
+                if (tuple.Service.IsRunning)    
                 {
                     return;
                 }

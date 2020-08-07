@@ -3,6 +3,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Slavestefan.Aphrodite.Model;
+using Slavestefan.Aphrodite.Model.Users;
 using Slavestefan.Aphrodite.Web.Services;
 
 namespace Slavestefan.Aphrodite.Web.Modules

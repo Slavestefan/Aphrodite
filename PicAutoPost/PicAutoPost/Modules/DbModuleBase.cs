@@ -53,5 +53,18 @@ namespace Slavestefan.Aphrodite.Web.Modules
             await ReplyAsync(embed: embed.Build());
         }
 
+        public async Task ReplySimpleEmbedAsync(EmbedBuilder embed)
+        {
+            if (embed.Footer == null)
+            {
+                embed.Footer = new EmbedFooterBuilder
+                {
+                    Text = $"Request by {Context.User.Username}#{Context.User.Discriminator}"
+                };
+            }
+
+            await ReplyAsync(embed: embed.Build());
+        }
+
     }
 }
