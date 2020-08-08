@@ -43,14 +43,10 @@ namespace Slavestefan.Aphrodite.Web.Modules
                         Name = "Reply",
                         Value = message
                     }
-                },
-                Footer = new EmbedFooterBuilder
-                {
-                    Text = $"Request by {Context.User.Username}#{Context.User.Discriminator}"
                 }
             };
 
-            await ReplyAsync(embed: embed.Build());
+            await ReplySimpleEmbedAsync(embed);
         }
 
         public async Task ReplySimpleEmbedAsync(EmbedBuilder embed)

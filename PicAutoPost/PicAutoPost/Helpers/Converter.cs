@@ -24,5 +24,10 @@ namespace Slavestefan.Aphrodite.Web.Helpers
 
             return builder.Build();
         }
+
+        public static string ToMention(this ulong userSnowflake)
+        {
+            return $"<@!{userSnowflake}>";
+        }
     }
 }

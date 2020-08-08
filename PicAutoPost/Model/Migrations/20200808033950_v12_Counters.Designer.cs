@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Slavestefan.Aphrodite.Model;
 
 namespace Slavestefan.Aphrodite.Model.Migrations
 {
     [DbContext(typeof(PicAutoPostContext))]
-    partial class PicAutoPostContextModelSnapshot : ModelSnapshot
+    [Migration("20200808033950_v12_Counters")]
+    partial class v12_Counters
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -277,9 +279,6 @@ namespace Slavestefan.Aphrodite.Model.Migrations
                     b.Property<bool>("IsHidden")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("TotalAmount")
                         .HasColumnType("int");
 
@@ -291,33 +290,6 @@ namespace Slavestefan.Aphrodite.Model.Migrations
                     b.HasIndex("UserIdUser");
 
                     b.ToTable("Counters");
-                });
-
-            modelBuilder.Entity("Slavestefan.Aphrodite.Model.Tracker.CounterHistory", b =>
-                {
-                    b.Property<Guid>("IdCounterHistory")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("AmountChanged")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("ByUserIdUser")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("ChangeType")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("CounterIdCounter")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("IdCounterHistory");
-
-                    b.HasIndex("ByUserIdUser");
-
-                    b.HasIndex("CounterIdCounter");
-
-                    b.ToTable("CounterHistory");
                 });
 
             modelBuilder.Entity("Slavestefan.Aphrodite.Model.Users.OwnerSlaveRelationship", b =>
@@ -473,21 +445,6 @@ namespace Slavestefan.Aphrodite.Model.Migrations
                     b.HasOne("Slavestefan.Aphrodite.Model.Users.User", "User")
                         .WithMany()
                         .HasForeignKey("UserIdUser");
-                });
-
-            modelBuilder.Entity("Slavestefan.Aphrodite.Model.Tracker.CounterHistory", b =>
-                {
-                    b.HasOne("Slavestefan.Aphrodite.Model.Users.User", "ByUser")
-                        .WithMany()
-                        .HasForeignKey("ByUserIdUser")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Slavestefan.Aphrodite.Model.Tracker.Counter", "Counter")
-                        .WithMany()
-                        .HasForeignKey("CounterIdCounter")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Slavestefan.Aphrodite.Model.Users.OwnerSlaveRelationship", b =>

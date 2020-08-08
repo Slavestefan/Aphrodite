@@ -31,6 +31,7 @@ namespace Slavestefan.Aphrodite.Web.Services
         private Timer _keepAlive;
         private DrivebyHandler _drivebyHandler;
         private CancellationToken _stopExecutionToken;
+        private readonly ILogger<Bot> _logger;
 
         public Bot(IServiceProvider serviceProvider, string botToken)
         {
@@ -38,6 +39,7 @@ namespace Slavestefan.Aphrodite.Web.Services
             _serviceProvider = serviceProvider;
             _botToken = botToken;
             _commands = _serviceProvider.GetService<CommandService>();
+            _logger = _serviceProvider.GetService<ILogger<Bot>>();
         }
 
         public DiscordSocketClient Client
@@ -178,13 +180,20 @@ namespace Slavestefan.Aphrodite.Web.Services
                 return;
             }
 
-            // Finally some code that actually belongs in this method.
-            var context = new SocketCommandContext(_client, msg);
+            try
+            {
+                // Finally some code that actually belongs in this method.
+                var context = new SocketCommandContext(_client, msg);
 
-            var result = await _commands.ExecuteAsync(
-                context: context,
-                argPos: 4,
-                services: _serviceProvider);
+                var result = await _commands.ExecuteAsync(
+                    context: context,
+                    argPos: 4,
+                    services: _serviceProvider);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+            }
         }
 
         public override async Task StopAsync(CancellationToken cancellationToken)
