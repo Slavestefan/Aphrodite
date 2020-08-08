@@ -28,7 +28,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
                 userDescriptor = userDescriptor.Trim('<', '@', '!', '>');
             }
 
-            if (!ulong.TryParse(userDescriptor, out var snowflake))
+            if (ulong.TryParse(userDescriptor, out var snowflake))
             {
                 return TypedDbContext.Users.FirstOrDefault(x => x.DiscordId == snowflake);
             }
