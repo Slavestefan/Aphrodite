@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Slavestefan.Aphrodite.Model;
 
 namespace Slavestefan.Aphrodite.Model.Migrations
 {
     [DbContext(typeof(PicAutoPostContext))]
-    partial class PicAutoPostContextModelSnapshot : ModelSnapshot
+    [Migration("20200808174018_v14_CounterHistoryTimestamp")]
+    partial class v14_CounterHistoryTimestamp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -275,9 +277,6 @@ namespace Slavestefan.Aphrodite.Model.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsHidden")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsLocked")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")

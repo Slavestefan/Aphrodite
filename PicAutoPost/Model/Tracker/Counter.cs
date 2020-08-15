@@ -17,5 +17,6 @@ namespace Slavestefan.Aphrodite.Model.Tracker
         public string Description {get;set;}
         public User User {get;set;}
         public bool IsHidden {get;set;}
+        public bool IsLocked {get;set;}
     }
 }

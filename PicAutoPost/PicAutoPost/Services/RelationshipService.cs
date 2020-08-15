@@ -52,6 +52,11 @@ namespace Slavestefan.Aphrodite.Web.Services
         public async Task<bool> ConfirmRelationship(ulong owner, ulong slave, OwnerSlaveRelationshipTypes type)
         {
             var relationship = await GetRelationship(owner, slave);
+            if (relationship == null)
+            {
+                return false;
+            }
+            
             return relationship.Type.HasFlag(type);
         }
 

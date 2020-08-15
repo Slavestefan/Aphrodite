@@ -49,6 +49,11 @@ namespace Slavestefan.Aphrodite.Web.Modules
             await ReplySimpleEmbedAsync(embed);
         }
 
+        public async Task ReplyWithDefaultErrorMessage()
+        {
+            await ReplySimpleEmbedAsync("An error has occured. My maintenance slave has been informed.");
+        }
+
         public async Task ReplySimpleEmbedAsync(EmbedBuilder embed)
         {
             if (embed.Footer == null)

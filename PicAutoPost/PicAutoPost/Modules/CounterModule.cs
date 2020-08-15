@@ -67,6 +67,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
+                await ReplyWithDefaultErrorMessage();
             }
         }
 
@@ -133,15 +134,9 @@ namespace Slavestefan.Aphrodite.Web.Modules
                 }
                 else
                 {
-                    embed = new EmbedBuilder
-                    {
-                        Description = "Info for counter: " + counter.IdCounter,
-                        Fields =
-                        {
-                            new EmbedFieldBuilder { Name = "Progress", Value = $"{counter.CompletedAmount}/{counter.TotalAmount}"},
-                            new EmbedFieldBuilder { Name = "Hidden from User", Value = counter.IsHidden}
-                        }
-                    };
+                    embed.AddField(new EmbedFieldBuilder { Name = "Progress", Value = $"{counter.CompletedAmount}/{counter.TotalAmount}" });
+                    embed.AddField(new EmbedFieldBuilder {Name = "Goal Locked for User", Value = counter.IsLocked});
+                    embed.AddField(new EmbedFieldBuilder { Name = "Hidden from User", Value = counter.IsHidden });
                 }
 
                 await ReplySimpleEmbedAsync(embed);
@@ -149,6 +144,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
+                await ReplyWithDefaultErrorMessage();
             }
         }
 
@@ -178,6 +174,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
                     AmountChanged = progress,
                     ByUser = await TypedDbContext.GetOrCreateUserAsync(Context.Message.Author.Id, Context.Message.Author.Username),
                     ChangeType = ChangeType.Progress,
+                    Timestamp = DateTime.Now,
                     Counter = counter
                 };
 
@@ -202,6 +199,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
+                await ReplyWithDefaultErrorMessage();
             }
         }
 
@@ -220,9 +218,9 @@ namespace Slavestefan.Aphrodite.Web.Modules
                 }
 
                 var owner = _relationshipService.GetOwner(counter.User.DiscordId);
-                if (owner != null && counter.User.DiscordId == Context.Message.Author.Id)
+                if (owner != null && counter.IsLocked && counter.User.DiscordId == Context.Message.Author.Id)
                 {
-                    await ReplySimpleEmbedAsync("Only your owner can change the goal on your counters");
+                    await ReplySimpleEmbedAsync("Counter locked. Only your owner can change the goal");
                     return;
                 }
 
@@ -237,12 +235,104 @@ namespace Slavestefan.Aphrodite.Web.Modules
                 };
                 TypedDbContext.CounterHistory.Add(history);
                 TypedDbContext.SaveChanges();
+                var hideGoal = counter.IsHidden && !(Context.Channel is IDMChannel);
 
-                await ReplySimpleEmbedAsync($"Goal updated, new goal is {counter.TotalAmount}");
+                await ReplySimpleEmbedAsync($"Goal updated, new goal is {(hideGoal ? "hidden" : counter.TotalAmount.ToString())}");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex.ToString());
+                await ReplyWithDefaultErrorMessage();
+            }
+        }
+
+        private enum SettingType
+        {
+            Lock,
+            Hide
+        }
+
+        [Command("Lock")]
+        public async Task Lock(string nameOrId)
+        {
+            await ToggleSetting(nameOrId, true, SettingType.Lock);
+        }
+
+        [Command("Unlock")]
+        public async Task Unlock(string nameOrId)
+        {
+            await ToggleSetting(nameOrId, false, SettingType.Lock);
+        }
+
+        [Command("Hide")]
+        public async Task Hide(string nameOrId)
+        {
+            await ToggleSetting(nameOrId, true, SettingType.Hide);
+        }
+
+        [Command("Reveal")]
+        public async Task Reveal(string nameOrId)
+        {
+            await ToggleSetting(nameOrId, false, SettingType.Hide);
+        }
+
+        
+
+        private async Task ToggleSetting(string nameOrId, bool lockSetting, SettingType settingType)
+        {
+            try
+            {
+                string set, unset;
+
+                switch (settingType)
+                {
+                    case SettingType.Lock:
+                        set = "locked";
+                        unset = "unlocked";
+                        break;
+                    case SettingType.Hide:
+                        set = "hidden";
+                        unset = "revealed";
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(settingType), settingType, null);
+                }
+
+                var isGuid = Guid.TryParse(nameOrId, out var guid);
+                var counter = TypedDbContext.Counters.Include(x => x.User).FirstOrDefault(x => x.Name == nameOrId || (isGuid && x.IdCounter == guid));
+
+                if (counter == null || !await HasCounterPermission(Context.Message.Author.Id, counter))
+                {
+                    await ReplySimpleEmbedAsync("Unknown counter. Please use the name or GUID");
+                    return;
+                }
+
+                var owner = _relationshipService.GetOwner(counter.User.DiscordId);
+                if (owner != null && counter.User.DiscordId == Context.Message.Author.Id)
+                {
+                    await ReplySimpleEmbedAsync($"Only your owner can your counters to be {set} or {unset}");
+                    return;
+                }
+
+                switch (settingType)
+                {
+                    case SettingType.Lock:
+                        counter.IsLocked = lockSetting;
+                        break;
+                    case SettingType.Hide:
+                        counter.IsHidden = lockSetting;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(settingType), settingType, null);
+                }
+                TypedDbContext.SaveChanges();
+
+                await ReplySimpleEmbedAsync($"Counter {(lockSetting ? set : unset)}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                await ReplyWithDefaultErrorMessage();
             }
         }
 
@@ -259,7 +349,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
         //            await ReplySimpleEmbedAsync("Unknown counter. Please use the name or GUID");
         //            return;
         //        }
-                
+
         //        var embedFields = TypedDbContext.CounterHistory.Include(x => x.Counter).Where(x => x.Counter.IdCounter == counter.IdCounter).Select(x => new EmbedFieldBuilder
         //        {
         //            Name = 
@@ -284,7 +374,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
             }
 
             var relationship = await _relationshipService.GetRelationship(userSnowflake, counter.User.DiscordId);
-            if (relationship.Status.HasFlag(OwnerSlaveRelationshipTypes.Tracker))
+            if (relationship.Type.HasFlag(OwnerSlaveRelationshipTypes.Tracker))
             {
                 return true;
             }
