@@ -21,10 +21,12 @@ namespace Slavestefan.Aphrodite.Web.Modules
     {
         private readonly ILogger<TaskModule> _logger;
         private readonly TaskService _taskService;
+        private readonly RelationshipService _relationshipService;
 
         public TaskModule(IServiceProvider services, ILogger<TaskModule> logger) : base(services)
         {
             _logger = logger;
+            _relationshipService = new RelationshipService(TypedDbContext);
             _taskService = new TaskService(TypedDbContext);
         }
 
@@ -69,10 +71,12 @@ namespace Slavestefan.Aphrodite.Web.Modules
                     return;
                 }
 
-                if (taskSet.Owner.DiscordId != Context.User.Id)
+                if (taskSet.Owner.DiscordId != Context.User.Id && !await _relationshipService.ConfirmRelationship(Context.User.Id, taskSet.Owner.DiscordId, Model.Users.OwnerSlaveRelationshipTypes.Taskmaster))
                 {
                     await ReplySimpleEmbedAsync($"You are not the owner of this taskset");
                 }
+
+                description = description.Trim('"');
 
                 var task = new ApTask
                 {
