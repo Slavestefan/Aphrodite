@@ -166,7 +166,7 @@ namespace Slavestefan.Aphrodite.Web.Services
             }
 
             // TODO: Put this in 
-            if (!(message is SocketUserMessage msg) || !msg.Content.StartsWith("!ap"))
+            if (!(message is SocketUserMessage msg) || !msg.Content.StartsWith("!ap") || msg.Content.Trim() == "!ap")
             {
                 return;
             }
