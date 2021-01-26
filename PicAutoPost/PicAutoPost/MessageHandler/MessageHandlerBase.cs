@@ -8,6 +8,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Slavestefan.Aphrodite.Web.MessageHandler
 {
+    /// <summary>
+    /// Class to implement to handle non command messages (i.e. messages that don't start with !ap)
+    /// </summary>
     public abstract class MessageHandlerBase : IDiscordMessageHandler
     {
         private readonly ILogger<MessageHandlerBase> _logger;
@@ -39,6 +42,11 @@ namespace Slavestefan.Aphrodite.Web.MessageHandler
             }
         }
 
+        /// <summary>
+        /// Handles message, provides Exception handling.
+        /// </summary>
+        /// <param name="message">Message to handle.</param>
+        /// <returns>Return false if you want this message to be handled by other handlers as well, otherwise return true.</returns>
         protected abstract Task<bool> HandleWithExceptionHandling(SocketMessage message);
     }
 }

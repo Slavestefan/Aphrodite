@@ -28,6 +28,7 @@ namespace Slavestefan.Aphrodite.Web
             services.AddDbContext<PicAutoPostContext>(options => options.UseSqlServer(Configuration.GetConnectionString("PicAutoPost")));
             services.AddSingleton<RandomService>();
             services.AddSingleton<CommandService>();
+            services.AddSingleton<MessageHandlerService>();
             services.AddSingleton<Bot>(sp => new Bot(sp, Configuration.GetSection("DiscordBotToken").GetValue<string>("Aphrodite")));
             services.AddSingleton<IHostedService>(sp => sp.GetService<Bot>());
             services.AddSingleton<PostingServiceHost>();

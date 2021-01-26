@@ -53,7 +53,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
         public async Task GetVersion()
         {
             var assembly = Assembly.GetExecutingAssembly();
-            await ReplyAsync($"Running version {assembly.GetName().Version} build date {new FileInfo(assembly.Location).CreationTimeUtc:yyyy-MM-dd} running in CLR Version {assembly.ImageRuntimeVersion} ");
+            await ReplyAsync($"Running version {assembly.GetName().Version} build date {new FileInfo(assembly.Location).CreationTimeUtc:yyyy-MM-dd} targeting Framework {AppContext.TargetFrameworkName} ");
         }
 
         [Command("Block")]

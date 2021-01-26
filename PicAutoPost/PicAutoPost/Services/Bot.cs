@@ -31,6 +31,7 @@ namespace Slavestefan.Aphrodite.Web.Services
         private Timer _keepAlive;
         private DrivebyHandler _drivebyHandler;
         private CancellationToken _stopExecutionToken;
+        private readonly MessageHandlerService _messageHandlerService;
         private readonly ILogger<Bot> _logger;
 
         public Bot(IServiceProvider serviceProvider, string botToken)
@@ -40,6 +41,7 @@ namespace Slavestefan.Aphrodite.Web.Services
             _botToken = botToken;
             _commands = _serviceProvider.GetService<CommandService>();
             _logger = _serviceProvider.GetService<ILogger<Bot>>();
+            _messageHandlerService = serviceProvider.GetRequiredService<MessageHandlerService>();
         }
 
         public DiscordSocketClient Client
@@ -134,11 +136,7 @@ namespace Slavestefan.Aphrodite.Web.Services
             await base.StartAsync(cancellationToken);
         }
 
-        private async Task MessWithSatin(SocketMessage message)
-        {
-            var index = _rng.Next(0, Constants.Phrases.SatinReactions.Length);
-            await message.Channel.SendMessageAsync($"```{Phrases.SatinReactions[index]}```");
-        }
+
 
         //TODO: Clean this mess up
         private async Task Client_MessageReceived(SocketMessage message)
@@ -151,17 +149,8 @@ namespace Slavestefan.Aphrodite.Web.Services
                 return;
             }
 
-            // Mess with Satin
-            if (message.Author.Id == Users.PrincessSatin && _antiSatinMode && message.Content.ToLower().Contains("aphrodite"))
+            if (await _messageHandlerService.HandleMessage(message))
             {
-                await MessWithSatin(message);   
-                return;
-            }
-
-            // Driveby Handler TODO: User generic message handlers.
-            if (_drivebyHandler.WantsToHandle(message))
-            {
-                await _drivebyHandler.Handle(message);
                 return;
             }
 

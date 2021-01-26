@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Discord;
 using Discord.WebSocket;
 using Slavestefan.Aphrodite.Model;
 using Slavestefan.Aphrodite.Model.Users;
@@ -28,6 +29,23 @@ namespace Slavestefan.Aphrodite.Web.Helpers
             }
 
             return picList.GroupBy(x => new { x }).Select(x => x.First()).ToList();
+        }
+
+        public static EmbedBuilder GetSimpleEmbedFromMessage(string message)
+        {
+            var embed = new EmbedBuilder
+            {
+                Fields = new System.Collections.Generic.List<EmbedFieldBuilder>
+                {
+                    new EmbedFieldBuilder
+                    {
+                        IsInline = true,
+                        Name = message
+                    }
+                }
+            };
+            
+            return embed;
         }
     }
 }

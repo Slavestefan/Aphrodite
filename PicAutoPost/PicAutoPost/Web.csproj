@@ -4,7 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>Slavestefan.Aphrodite.Web</AssemblyName>
     <RootNamespace>Slavestefan.Aphrodite.Web</RootNamespace>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <UserSecretsId>4b097a77-750d-4b91-8932-7f3c71cf04c7</UserSecretsId>
   </PropertyGroup>
 
