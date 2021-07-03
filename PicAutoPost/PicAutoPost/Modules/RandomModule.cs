@@ -1,8 +1,7 @@
-﻿
-
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Discord.Commands;
+using Slavestefan.Aphrodite.Model;
 using Slavestefan.Aphrodite.Web.Services;
 
 namespace Slavestefan.Aphrodite.Web.Modules
@@ -12,7 +11,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
     {
         private readonly RandomService _rng;
 
-        public RandomModule(RandomService rng, IServiceProvider services) : base(services)
+        public RandomModule(RandomService rng, PicAutoPostContext context, BotConfigService configService) : base(context, configService)
         {
             _rng = rng;
         }

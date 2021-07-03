@@ -16,9 +16,9 @@ namespace Slavestefan.Aphrodite.Web.Modules
             get;
         }
 
-        public AphroditeModuleBase(IServiceProvider services) : base(services)
+        public AphroditeModuleBase(PicAutoPostContext context, BotConfigService botConfigService) : base(context)
         {
-            BotConfigService = Scope.ServiceProvider.GetRequiredService<BotConfigService>();
+            BotConfigService = botConfigService;
         }
 
         protected User GetUserFromSnowflakeOrUsernameOrMention(string userDescriptor)

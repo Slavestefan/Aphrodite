@@ -7,27 +7,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Slavestefan.Aphrodite.Web.Modules
 {
-    public class DbModuleBase<TDbContext> : ModuleBase<SocketCommandContext> where TDbContext : DbContext, IDisposable
+    public class DbModuleBase<TDbContext> : ModuleBase<SocketCommandContext> where TDbContext : DbContext
     {
         protected TDbContext TypedDbContext
         {
             get;
         }
-
-        protected IServiceScope Scope
+        
+        public DbModuleBase(TDbContext context)
         {
-            get;
-        }
-
-        public DbModuleBase(IServiceProvider services)
-        {
-            Scope = services.CreateScope();
-            TypedDbContext = Scope.ServiceProvider.GetRequiredService<TDbContext>();
-        }
-
-        public void Dispose()
-        {
-            Scope.Dispose();
+            TypedDbContext = context;
         }
 
         public async Task ReplySimpleEmbedAsync(string message, Color? color = null)

@@ -8,11 +8,11 @@ using Discord.Commands;
 
 namespace Slavestefan.Aphrodite.Web.Helpers
 {
-    public class RequireUserPrecondition : PreconditionAttribute
+    public class RequireUserPreconditionAttribute : PreconditionAttribute
     {
         private readonly ulong[] _users;
 
-        public RequireUserPrecondition(ulong[] users)
+        public RequireUserPreconditionAttribute(ulong[] users)
         {
             _users = users;
         }

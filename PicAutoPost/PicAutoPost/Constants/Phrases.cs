@@ -13,7 +13,9 @@ namespace Slavestefan.Aphrodite.Web.Constants
             "Maybe some other time Satin",
             "Stop missing my drivebys and we'll talk",
             "Leave me alone you big meanie!",
-            "If you grope me again Satin, you'll regret it!"
+            "If you grope me again Satin, you'll regret it!",
+            "What now Satin?",
+            "*sigh* Not again Satin",
         };
 
         public const string SatinRoll1 = "Now you've done it Satin, here's your punishment";

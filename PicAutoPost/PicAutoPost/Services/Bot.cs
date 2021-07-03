@@ -92,7 +92,7 @@ namespace Slavestefan.Aphrodite.Web.Services
         private Task StartPosting()
         {
             try
-            {
+            { 
                 var postingService = _serviceProvider.GetService<PostingServiceHost>();
                 postingService.StartupPosting();
             }
@@ -135,7 +135,6 @@ namespace Slavestefan.Aphrodite.Web.Services
             await _client.StartAsync();
             await base.StartAsync(cancellationToken);
         }
-
 
 
         //TODO: Clean this mess up

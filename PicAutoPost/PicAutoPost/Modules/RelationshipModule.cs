@@ -1,10 +1,9 @@
-﻿
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Discord.Commands;
 using Microsoft.Extensions.Logging;
+using Slavestefan.Aphrodite.Model;
 using Slavestefan.Aphrodite.Model.Users;
 using Slavestefan.Aphrodite.Web.Services;
 
@@ -16,7 +15,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
         private readonly ILogger<RelationshipModule> _logger;
         private readonly RelationshipService _relationshipService;
 
-        public RelationshipModule(IServiceProvider services, Bot bot, ILogger<RelationshipModule> logger) : base(services)
+        public RelationshipModule(Bot bot, ILogger<RelationshipModule> logger, PicAutoPostContext context, BotConfigService config) : base(context, config)
         {
             _bot = bot;
             _logger = logger;

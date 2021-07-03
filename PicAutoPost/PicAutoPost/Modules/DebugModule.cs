@@ -24,7 +24,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
         private readonly PostingServiceHost _postingServiceHost;
         private readonly ILogger<DebugModule> _logger;
 
-        public DebugModule(IServiceProvider services, Bot bot, PostingServiceHost postingServiceHost, ILogger<DebugModule>  logger) : base(services)
+        public DebugModule(PicAutoPostContext context, Bot bot, PostingServiceHost postingServiceHost, ILogger<DebugModule>  logger) : base(context)
         {
             _bot = bot;
             _postingServiceHost = postingServiceHost;

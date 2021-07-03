@@ -13,12 +13,12 @@ using Slavestefan.Aphrodite.Model.Users;
 namespace Slavestefan.Aphrodite.Web.Modules
 {
     //TODO: Combine into picture Module
-    public class AddModule : DbModuleBase<PicAutoPostContext>, IDisposable
+    public class AddModule : DbModuleBase<PicAutoPostContext>
     {
         private readonly ILogger<DbModuleBase<PicAutoPostContext>> _logger;
         private HttpClient _client;
 
-        public AddModule(IServiceProvider services, ILogger<AddModule> logger) : base(services)
+        public AddModule(PicAutoPostContext context, ILogger<AddModule> logger) : base(context)
         {
             _logger = logger;
         }

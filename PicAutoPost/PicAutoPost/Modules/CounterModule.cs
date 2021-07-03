@@ -5,6 +5,7 @@ using Discord;
 using Discord.Commands;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Slavestefan.Aphrodite.Model;
 using Slavestefan.Aphrodite.Model.Tracker;
 using Slavestefan.Aphrodite.Model.Users;
 using Slavestefan.Aphrodite.Web.Helpers;
@@ -18,7 +19,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
         private readonly ILogger<CounterModule> _logger;
         private readonly RelationshipService _relationshipService;
 
-        public CounterModule(IServiceProvider services, ILogger<CounterModule> logger) : base(services)
+        public CounterModule(PicAutoPostContext context, ILogger<CounterModule> logger, BotConfigService configService) : base(context, configService)
         {
             _logger = logger;
             _relationshipService = new RelationshipService(TypedDbContext);

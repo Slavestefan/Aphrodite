@@ -127,6 +127,12 @@ namespace Slavestefan.Aphrodite.Web.Modules
                     return;
                 }
 
+                if (taskSet == null)
+                {
+                    await ReplySimpleEmbedAsync("Not a valid taskset");
+                    return;
+                }
+
                 IList<ApTask> result;
 
                 if (taskSet.DoesMultirollRepeat)

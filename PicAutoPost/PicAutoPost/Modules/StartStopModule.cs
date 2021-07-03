@@ -16,7 +16,7 @@ namespace Slavestefan.Aphrodite.Web.Modules
         private readonly ILogger<StartStopModule> _logger;
 
 
-        public StartStopModule(IServiceProvider services, PostingServiceHost postingHost, ILogger<StartStopModule> logger) : base(services)
+        public StartStopModule(PicAutoPostContext context, PostingServiceHost postingHost, ILogger<StartStopModule> logger, BotConfigService configService) : base(context)
         {
             _postingHost = postingHost;
             _logger = logger;

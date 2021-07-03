@@ -13,10 +13,12 @@ namespace Slavestefan.Aphrodite.Web.MessageHandler
     public class SatinHandler : MessageHandlerBase
     {
         private readonly RandomService _rng;
+        private readonly BotConfigService _config;
 
-        public SatinHandler(ILogger<MessageHandlerBase> logger, RandomService rng) : base(logger)
+        public SatinHandler(ILogger<MessageHandlerBase> logger, RandomService rng, BotConfigService config) : base(logger)
         {
             _rng = rng;
+            _config = config;
         }
 
         public override bool WantsToHandle(SocketMessage message)
@@ -29,7 +31,7 @@ namespace Slavestefan.Aphrodite.Web.MessageHandler
                 return false;
             }
 
-            if (message.Author.Id == Constants.Users.PrincessSatin && message.Content.Contains("Aphrodite"))
+            if (message.Author.Id == Constants.Users.PrincessSatin && (message.Content.ToLower().Contains("aphrodite") || message.Content.ToLower().Contains("aphy")|| message.Content.ToLower().Contains("aphi")))
             {
                 return true;
             }
@@ -39,9 +41,14 @@ namespace Slavestefan.Aphrodite.Web.MessageHandler
 
         protected override async Task<bool> HandleWithExceptionHandling(SocketMessage message)
         {
+            if (message.Content.StartsWith("!ap task roll"))
+            {
+
+            }
+
             var result = Phrases.SatinReactions.GetRandom();
             await message.Channel.SendMessageAsync(result);
-            if (_rng.Rng.Next(1,5) == 1)
+            if (_rng.Rng.Next(1, 5) == 1)
             {
                 await message.Channel.SendMessageAsync(Phrases.SatinRoll1);
                 await message.Channel.SendMessageAsync(Phrases.SatinRoll2);
